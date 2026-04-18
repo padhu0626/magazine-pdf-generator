@@ -1,0 +1,72 @@
+/* Template 3: Editor's Letter */
+.editors-letter {
+    page: article-first;
+    break-after: page;
+}
+
+.editors-letter .letter-header {
+    text-align: center;
+    margin-bottom: 20pt;
+}
+
+.editors-letter .letter-header h1 {
+    font-family: var(--font-tamil-display);
+    font-size: 24pt;
+    font-weight: 800;
+    color: var(--color-primary);
+    margin-bottom: 6pt;
+}
+
+.editors-letter .letter-header .accent-bar {
+    width: 30pt;
+    height: 2pt;
+    background: var(--color-accent);
+    margin: 0 auto;
+}
+
+.editors-letter .editor-portrait {
+    float: left;
+    width: 80pt;
+    height: 80pt;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 14pt 10pt 0;
+    border: 2pt solid var(--color-gold);
+    background: var(--color-cream);
+}
+
+.editors-letter .letter-body {
+    font-size: 11pt;
+    line-height: 1.6;
+    text-align: justify;
+}
+
+.editors-letter .letter-body p {
+    margin-bottom: 8pt;
+}
+
+.editors-letter .letter-body > p:first-of-type::first-letter {
+    font-family: var(--font-tamil-display);
+    font-size: 3em;
+    float: left;
+    line-height: 0.8;
+    margin-right: 0.06em;
+    margin-top: 0.05em;
+    color: var(--color-accent);
+    font-weight: 900;
+}
+
+.editors-letter .signature {
+    margin-top: 20pt;
+    text-align: right;
+    font-family: var(--font-tamil-display);
+    font-size: 12pt;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.editors-letter .signature .title {
+    font-size: 9pt;
+    font-weight: 400;
+    color: var(--color-muted);
+}

@@ -1,0 +1,77 @@
+/* Template 10: Photo Essay */
+.photo-essay {
+    break-after: page;
+}
+
+.photo-essay .photo-header {
+    margin-bottom: 16pt;
+}
+
+.photo-essay .photo-header .category-tag {
+    font-family: var(--font-english);
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--color-gold);
+    margin-bottom: 8pt;
+    display: block;
+}
+
+.photo-essay .photo-header h1 {
+    font-size: 24pt;
+    margin-bottom: 6pt;
+}
+
+.photo-essay .photo-header .byline {
+    font-size: 9pt;
+}
+
+.photo-essay .photo-grid {
+    display: grid;
+    gap: 8pt;
+}
+
+.photo-essay .photo-full {
+    width: 100%;
+    margin: 10pt 0;
+    break-inside: avoid;
+}
+
+.photo-essay .photo-full img {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: var(--color-cream);
+    min-height: 150pt;
+}
+
+.photo-essay .photo-full figcaption {
+    font-size: 8.5pt;
+    color: var(--color-caption);
+    margin-top: 4pt;
+    line-height: 1.4;
+}
+
+.photo-essay .photo-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8pt;
+    margin: 10pt 0;
+    break-inside: avoid;
+}
+
+.photo-essay .photo-pair img {
+    width: 100%;
+    height: auto;
+    background: var(--color-cream);
+    min-height: 100pt;
+}
+
+.photo-essay .essay-text {
+    font-size: 10pt;
+    line-height: 1.6;
+    color: var(--color-caption);
+    margin: 12pt 0;
+    font-style: italic;
+    max-width: 80%;
+}

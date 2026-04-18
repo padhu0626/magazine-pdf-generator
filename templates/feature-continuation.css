@@ -1,0 +1,33 @@
+/* Template 5: Feature Article — Continuation Pages */
+.feature-continuation .article-body {
+    column-count: 2;
+    column-gap: 6mm;
+    text-align: justify;
+}
+
+.feature-continuation .article-body p {
+    margin-bottom: 6pt;
+}
+
+.feature-continuation .article-body p + p {
+    text-indent: 1.5em;
+}
+
+.feature-continuation .inline-image {
+    column-span: all;
+    margin: 14pt 0;
+    break-inside: avoid;
+}
+
+.feature-continuation .inline-image img {
+    width: 100%;
+    height: auto;
+}
+
+.feature-continuation .inline-image figcaption {
+    font-size: 8pt;
+    color: var(--color-caption);
+    margin-top: 4pt;
+    border-bottom: 0.5pt solid var(--color-divider);
+    padding-bottom: 6pt;
+}

@@ -1,0 +1,74 @@
+/* Template 9: Editorial / Opinion */
+.editorial-page .editorial-header {
+    margin-bottom: 18pt;
+    padding-bottom: 12pt;
+    border-bottom: 3pt solid var(--color-accent);
+}
+
+.editorial-page .editorial-header .opinion-tag {
+    font-family: var(--font-english);
+    font-size: 9pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #fff;
+    background: var(--color-accent);
+    display: inline-block;
+    padding: 2pt 8pt;
+    margin-bottom: 10pt;
+}
+
+.editorial-page .editorial-header h1 {
+    font-size: 26pt;
+    margin-bottom: 8pt;
+}
+
+.editorial-page .editorial-header .byline {
+    display: flex;
+    align-items: center;
+    gap: 10pt;
+}
+
+.editorial-page .editorial-header .author-photo {
+    width: 40pt;
+    height: 40pt;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--color-cream);
+    border: 1.5pt solid var(--color-divider);
+}
+
+.editorial-page .editorial-header .author-info {
+    font-size: 9pt;
+    color: var(--color-muted);
+}
+
+.editorial-page .editorial-header .author-info .name {
+    font-weight: 700;
+    color: var(--color-body);
+    font-size: 10pt;
+}
+
+.editorial-page .editorial-body {
+    column-count: 2;
+    column-gap: 6mm;
+    text-align: justify;
+}
+
+.editorial-page .editorial-body p {
+    margin-bottom: 6pt;
+}
+
+.editorial-page .editorial-body p + p {
+    text-indent: 1.5em;
+}
+
+.editorial-page .editorial-body > p:first-of-type::first-letter {
+    font-family: var(--font-tamil-display);
+    font-size: 3.2em;
+    float: left;
+    line-height: 0.8;
+    margin-right: 0.06em;
+    color: var(--color-accent);
+    font-weight: 900;
+}

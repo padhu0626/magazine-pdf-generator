@@ -1,0 +1,81 @@
+/* Template 8: Poetry Page */
+.poetry-page {
+    break-after: page;
+}
+
+.poetry-page .poetry-header {
+    text-align: center;
+    margin-bottom: 30pt;
+}
+
+.poetry-page .poetry-header .genre-tag {
+    font-family: var(--font-english);
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--color-gold);
+    margin-bottom: 12pt;
+    display: block;
+}
+
+.poetry-page .poetry-header h1 {
+    font-family: var(--font-tamil-display);
+    font-size: 26pt;
+    font-weight: 800;
+    color: var(--color-primary);
+    margin-bottom: 6pt;
+}
+
+.poetry-page .poetry-header .poet-name {
+    font-family: var(--font-tamil-body);
+    font-size: 11pt;
+    color: var(--color-muted);
+}
+
+.poem {
+    max-width: 70%;
+    margin: 0 auto 30pt;
+    break-inside: avoid;
+}
+
+.poem .poem-title {
+    font-family: var(--font-tamil-display);
+    font-size: 16pt;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 8pt;
+    text-align: center;
+}
+
+.poem .poem-body {
+    font-family: var(--font-tamil-body);
+    font-size: 12pt;
+    line-height: 2;
+    text-align: center;
+    color: var(--color-body);
+}
+
+.poem .poem-body p {
+    margin-bottom: 6pt;
+}
+
+.poem .stanza-break {
+    height: 14pt;
+}
+
+.poem .poet-credit {
+    text-align: center;
+    font-family: var(--font-tamil-body);
+    font-size: 10pt;
+    color: var(--color-muted);
+    margin-top: 10pt;
+    font-style: italic;
+}
+
+.poem-divider {
+    text-align: center;
+    margin: 20pt 0;
+    color: var(--color-gold);
+    font-size: 10pt;
+    letter-spacing: 0.5em;
+}

@@ -1,0 +1,72 @@
+/* Template 7: Short Story / Fiction */
+.short-story .story-header {
+    text-align: center;
+    margin-bottom: 24pt;
+    padding-bottom: 16pt;
+    border-bottom: 0.5pt solid var(--color-divider);
+}
+
+.short-story .story-header .genre-tag {
+    font-family: var(--font-english);
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--color-gold);
+    margin-bottom: 10pt;
+    display: block;
+}
+
+.short-story .story-header h1 {
+    font-family: var(--font-tamil-display);
+    font-size: 30pt;
+    font-weight: 900;
+    color: var(--color-primary);
+    margin-bottom: 8pt;
+    line-height: 1.15;
+}
+
+.short-story .story-header .byline {
+    font-size: 10pt;
+    color: var(--color-muted);
+    text-align: center;
+}
+
+.short-story .story-body {
+    column-count: 2;
+    column-gap: 6mm;
+    text-align: justify;
+    font-size: 10.5pt;
+    line-height: 1.6;
+}
+
+.short-story .story-body p {
+    margin-bottom: 0;
+}
+
+.short-story .story-body p + p {
+    text-indent: 1.5em;
+}
+
+.short-story .story-body > p:first-of-type::first-letter {
+    font-family: var(--font-tamil-display);
+    font-size: 3.6em;
+    float: left;
+    line-height: 0.8;
+    margin-right: 0.06em;
+    margin-top: 0.05em;
+    color: var(--color-primary);
+    font-weight: 900;
+}
+
+.short-story .scene-break {
+    column-span: all;
+    text-align: center;
+    margin: 14pt 0;
+    color: var(--color-gold);
+    font-size: 12pt;
+    letter-spacing: 0.4em;
+}
+
+.short-story .end-mark {
+    column-span: all;
+}
