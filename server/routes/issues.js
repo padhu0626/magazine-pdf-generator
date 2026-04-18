@@ -35,11 +35,12 @@ loadIssue();
  * POST /api/issues/create — Create a new issue
  */
 router.post('/create', (req, res) => {
-    const { id, title, magazineName, date, tagline } = req.body;
+    const { id, title, magazineName, date, tagline, coverImage } = req.body;
     currentIssue = {
         id: id || `issue-${Date.now()}`,
         title: title || '',
         magazineName: magazineName || title || 'Magazine',
+        coverImage: coverImage || '',
         date: date || new Date().toLocaleDateString('ta-IN'),
         tagline: tagline || '',
         articles: [],
@@ -86,6 +87,21 @@ router.post('/reorder', (req, res) => {
     currentIssue.articles = reordered;
     saveIssue();
     res.json({ success: true });
+});
+
+/**
+ * POST /api/issues/update-article — Update an article's data (images, etc.)
+ */
+router.post('/update-article', (req, res) => {
+    if (!currentIssue) return res.status(400).json({ error: 'No issue' });
+    const { index, article } = req.body;
+    if (index >= 0 && index < currentIssue.articles.length && article) {
+        currentIssue.articles[index] = article;
+        saveIssue();
+        res.json({ success: true });
+    } else {
+        res.status(400).json({ error: 'Invalid index or article' });
+    }
 });
 
 /**

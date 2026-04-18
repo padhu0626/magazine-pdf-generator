@@ -8,6 +8,7 @@ const uploadRoutes = require('./routes/upload');
 const renderRoutes = require('./routes/render');
 const issueRoutes = require('./routes/issues');
 const publishRoutes = require('./routes/publish');
+const imageRoutes = require('./routes/images');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,6 +29,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/render', renderRoutes);
 app.use('/api/issues', issueRoutes);
 app.use('/api/publish', publishRoutes);
+app.use('/api/images', imageRoutes);
 
 // Home route
 app.get('/', (req, res) => {

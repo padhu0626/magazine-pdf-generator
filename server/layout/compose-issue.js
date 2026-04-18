@@ -84,6 +84,7 @@ function buildCover(issue, articles, magazineName) {
 
     return `
 <div class="cover-page">
+    ${issue.coverImage ? `<img class="cover-bg" src="${escapeHtml(issue.coverImage)}" alt="">` : ''}
     <div class="cover-overlay"></div>
     <div class="cover-content">
         <div class="cover-masthead">

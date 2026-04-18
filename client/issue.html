@@ -11,9 +11,11 @@
         .issue-header .field { flex: 1; min-width: 200px; }
         .article-list { margin-top: 1rem; }
         .article-item {
+            padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px;
+            margin-bottom: 0.75rem; background: #fafafa;
+        }
+        .article-item .article-top {
             display: flex; align-items: center; gap: 0.75rem;
-            padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px;
-            margin-bottom: 0.5rem; background: #fafafa;
         }
         .article-item .order { font-weight: 700; color: var(--accent); width: 24px; text-align: center; }
         .article-item .info { flex: 1; }
@@ -27,18 +29,42 @@
             background: none; border: none; color: #999; cursor: pointer; font-size: 1.2rem;
         }
         .article-item .remove-btn:hover { color: var(--accent); }
+
+        /* Image upload section per article */
+        .article-images {
+            margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--border);
+            display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: flex-start;
+        }
+        .img-upload-box {
+            border: 1px dashed var(--border); border-radius: 6px; padding: 0.5rem;
+            text-align: center; min-width: 120px; font-size: 0.75rem; color: var(--muted);
+            cursor: pointer; position: relative;
+        }
+        .img-upload-box:hover { border-color: var(--accent); background: #fef2f2; }
+        .img-upload-box input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        .img-upload-box .label { font-weight: 600; font-size: 0.8rem; color: var(--text); margin-bottom: 4px; }
+        .img-upload-box img.preview {
+            width: 80px; height: 60px; object-fit: cover; border-radius: 4px;
+            border: 1px solid var(--border); margin-top: 4px; display: block; margin: 4px auto 0;
+        }
+        .img-upload-box img.preview-portrait {
+            width: 50px; height: 60px; object-fit: cover; border-radius: 4px;
+            border: 1px solid var(--border); margin: 4px auto 0; display: block;
+        }
+        .img-upload-box .uploaded-label { color: #166534; font-size: 0.7rem; margin-top: 2px; }
+
         .nav-link { display: inline-block; margin-bottom: 1rem; color: var(--accent); font-size: 0.9rem; }
         .generate-result { margin-top: 1rem; padding: 1rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; text-align: center; }
         .generate-result a { color: var(--accent); font-weight: 600; }
-        .upload-inline { margin-top: 1rem; padding: 1rem; background: #f9fafb; border: 1px dashed var(--border); border-radius: 8px; }
-        .upload-inline input[type=file] { margin-right: 0.5rem; }
+        .upload-inline { margin-top: 1rem; padding: 1rem; background: #f9fafb; border: 1px dashed var(--border); border-radius: 8px; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
         .template-select-inline { padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.85rem; }
+        .magazine-name-input { font-size: 1.3rem !important; font-weight: 700 !important; }
     </style>
 </head>
 <body>
     <header class="header">
         <h1>Issue Assembly</h1>
-        <p>Create an issue, add articles, generate a complete magazine PDF</p>
+        <p>Create an issue, add articles with images, generate a complete magazine PDF</p>
     </header>
 
     <main class="container">
@@ -48,8 +74,8 @@
         <section class="card">
             <h2><span class="step">1</span> Issue Setup</h2>
             <div class="field">
-                <label>Magazine Name (appears on every page, cover, footer)</label>
-                <input type="text" id="magazine-name" class="input" placeholder="Your Magazine Name" value="" style="font-size:1.2rem;font-weight:700;">
+                <label>Magazine Name (appears on cover, headers, footers)</label>
+                <input type="text" id="magazine-name" class="input magazine-name-input" placeholder="Enter your magazine name">
             </div>
             <div class="issue-header">
                 <div class="field">
@@ -57,8 +83,8 @@
                     <input type="text" id="issue-id" class="input" placeholder="2026-01" value="2026-01">
                 </div>
                 <div class="field">
-                    <label>Issue Title</label>
-                    <input type="text" id="issue-title" class="input" placeholder="Issue theme/title" value="">
+                    <label>Issue Title / Theme</label>
+                    <input type="text" id="issue-title" class="input" placeholder="Theme of this issue">
                 </div>
                 <div class="field">
                     <label>Date</label>
@@ -66,8 +92,16 @@
                 </div>
             </div>
             <div class="field" style="margin-top:0.75rem;">
+                <label>Cover Image (optional)</label>
+                <div class="img-upload-box" style="display:inline-block; min-width:200px;">
+                    <input type="file" id="cover-image-input" accept="image/*">
+                    <div class="label">Upload Cover Image</div>
+                    <div id="cover-image-preview"></div>
+                </div>
+            </div>
+            <div class="field" style="margin-top:0.5rem;">
                 <label>Tagline (optional)</label>
-                <input type="text" id="issue-tagline" class="input" placeholder="பண்பாடு · இலக்கியம் · தொழில்நுட்பம்">
+                <input type="text" id="issue-tagline" class="input" placeholder="Subtitle or tagline">
             </div>
             <button class="btn btn-primary" id="create-issue-btn" style="margin-top:1rem;">Create Issue</button>
             <div id="issue-status" class="status" hidden></div>
@@ -95,15 +129,15 @@
             <div id="add-status" class="status" hidden></div>
 
             <div class="article-list" id="article-list">
-                <p class="muted" id="empty-msg">No articles yet. Upload .docx files above.</p>
+                <p class="muted">No articles yet. Upload .docx files above.</p>
             </div>
         </section>
 
         <!-- Generate -->
         <section class="card" id="generate-section" hidden>
             <h2><span class="step">3</span> Generate Magazine PDF</h2>
-            <p class="muted" style="margin-bottom:1rem;">This will combine cover + TOC + all articles + back cover into one magazine PDF.</p>
-            <button class="btn btn-primary btn-large" id="generate-magazine-btn">Generate Full Magazine PDF</button>
+            <p class="muted" style="margin-bottom:1rem;">Cover + TOC + all articles + back cover → one magazine PDF.</p>
+            <button class="btn btn-primary" id="generate-magazine-btn" style="width:100%;padding:0.8rem;font-size:1rem;">Generate Full Magazine PDF</button>
             <div id="gen-status" class="status" hidden></div>
             <div id="gen-result" class="generate-result" hidden></div>
         </section>
@@ -111,35 +145,52 @@
 
     <script>
     (function() {
-        var createBtn = document.getElementById('create-issue-btn');
-        var addBtn = document.getElementById('add-article-btn');
-        var genBtn = document.getElementById('generate-magazine-btn');
-        var articlesSection = document.getElementById('articles-section');
-        var generateSection = document.getElementById('generate-section');
-        var articleList = document.getElementById('article-list');
-        var emptyMsg = document.getElementById('empty-msg');
         var articles = [];
+        var coverImageUrl = '';
 
-        createBtn.addEventListener('click', async function() {
+        // --- Image upload helper ---
+        async function uploadImage(file) {
+            var fd = new FormData();
+            fd.append('image', file);
+            var r = await fetch('/api/images/upload', { method:'POST', body: fd });
+            var d = await r.json();
+            if (!d.success) throw new Error(d.error);
+            return d.url;
+        }
+
+        // Cover image
+        document.getElementById('cover-image-input').addEventListener('change', async function() {
+            if (!this.files[0]) return;
+            try {
+                coverImageUrl = await uploadImage(this.files[0]);
+                document.getElementById('cover-image-preview').innerHTML =
+                    '<img src="' + coverImageUrl + '" class="preview" style="width:160px;height:100px;"><div class="uploaded-label">Uploaded</div>';
+            } catch(e) { alert('Image upload failed: ' + e.message); }
+        });
+
+        // Create issue
+        document.getElementById('create-issue-btn').addEventListener('click', async function() {
             var body = {
                 id: document.getElementById('issue-id').value,
                 title: document.getElementById('issue-title').value,
                 magazineName: document.getElementById('magazine-name').value,
                 date: document.getElementById('issue-date').value,
                 tagline: document.getElementById('issue-tagline').value,
+                coverImage: coverImageUrl,
             };
             var r = await fetch('/api/issues/create', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
             var d = await r.json();
             if (d.success) {
                 show('issue-status','success','Issue created!');
-                articlesSection.hidden = false;
-                generateSection.hidden = false;
+                document.getElementById('articles-section').hidden = false;
+                document.getElementById('generate-section').hidden = false;
                 articles = [];
                 renderList();
             }
         });
 
-        addBtn.addEventListener('click', async function() {
+        // Add article
+        document.getElementById('add-article-btn').addEventListener('click', async function() {
             var file = document.getElementById('article-file').files[0];
             var template = document.getElementById('article-template').value;
             if (!file) { show('add-status','error','Select a .docx file'); return; }
@@ -151,13 +202,19 @@
             var d = await r.json();
             if (!d.success) { show('add-status','error',d.error); return; }
 
+            d.article.template = template;
+            d.article.authorPhoto = '';
+            d.article.heroImage = '';
+            d.article.heroCaption = '';
+            d.article.galleryPhotos = [];
+
             var r2 = await fetch('/api/issues/add-article', {
                 method:'POST', headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({ article:d.article, template:template })
+                body:JSON.stringify({ article: d.article, template: template })
             });
             var d2 = await r2.json();
             if (d2.success) {
-                articles.push({ ...d.article, template:template });
+                articles.push(d.article);
                 show('add-status','success','Article added! (' + d2.articleCount + ' total)');
                 document.getElementById('article-file').value = '';
                 renderList();
@@ -165,16 +222,79 @@
         });
 
         function renderList() {
-            if (articles.length === 0) { articleList.innerHTML = '<p class="muted">No articles yet.</p>'; return; }
-            articleList.innerHTML = articles.map(function(a, i) {
-                return '<div class="article-item">' +
+            var list = document.getElementById('article-list');
+            if (articles.length === 0) { list.innerHTML = '<p class="muted">No articles yet.</p>'; return; }
+
+            list.innerHTML = articles.map(function(a, i) {
+                return '<div class="article-item" data-idx="' + i + '">' +
+                    '<div class="article-top">' +
                     '<span class="order">' + (i+1) + '</span>' +
                     '<div class="info"><div class="title">' + esc(a.title) + '</div>' +
                     '<div class="meta">' + esc(a.author||'') + ' · ' + (a.wordCount||0) + ' words</div></div>' +
                     '<span class="template-badge">' + esc(a.template) + '</span>' +
-                    '<button class="remove-btn" data-idx="' + i + '">&times;</button></div>';
+                    '<button class="remove-btn" data-idx="' + i + '">&times;</button>' +
+                    '</div>' +
+                    '<div class="article-images">' +
+                    // Author photo upload
+                    '<div class="img-upload-box">' +
+                    '<input type="file" accept="image/*" data-idx="' + i + '" data-type="author">' +
+                    '<div class="label">Author Photo</div>' +
+                    (a.authorPhoto ? '<img src="'+esc(a.authorPhoto)+'" class="preview-portrait"><div class="uploaded-label">Done</div>' : '<div>Small passport size</div>') +
+                    '</div>' +
+                    // Banner image upload
+                    '<div class="img-upload-box">' +
+                    '<input type="file" accept="image/*" data-idx="' + i + '" data-type="banner">' +
+                    '<div class="label">Banner Image</div>' +
+                    (a.heroImage ? '<img src="'+esc(a.heroImage)+'" class="preview"><div class="uploaded-label">Done</div>' : '<div>Large top image</div>') +
+                    '</div>' +
+                    // Gallery photos (for gallery template)
+                    (a.template === 'gallery' ?
+                        '<div class="img-upload-box">' +
+                        '<input type="file" accept="image/*" data-idx="' + i + '" data-type="gallery" multiple>' +
+                        '<div class="label">Gallery Photos</div>' +
+                        (a.galleryPhotos.length > 0 ? '<div class="uploaded-label">' + a.galleryPhotos.length + ' photo(s)</div>' : '<div>1-4 images</div>') +
+                        '</div>' : '') +
+                    '</div>' +
+                    '</div>';
             }).join('');
-            articleList.querySelectorAll('.remove-btn').forEach(function(btn) {
+
+            // Bind image uploads
+            list.querySelectorAll('input[type=file]').forEach(function(inp) {
+                inp.addEventListener('change', async function() {
+                    var idx = parseInt(this.dataset.idx);
+                    var type = this.dataset.type;
+                    var files = this.files;
+                    if (!files || files.length === 0) return;
+
+                    try {
+                        if (type === 'author') {
+                            var url = await uploadImage(files[0]);
+                            articles[idx].authorPhoto = url;
+                            await updateArticleOnServer(idx);
+                        } else if (type === 'banner') {
+                            var url = await uploadImage(files[0]);
+                            articles[idx].heroImage = url;
+                            articles[idx].heroCaption = '';
+                            await updateArticleOnServer(idx);
+                        } else if (type === 'gallery') {
+                            for (var f = 0; f < Math.min(files.length, 4); f++) {
+                                var url = await uploadImage(files[f]);
+                                articles[idx].galleryPhotos.push({
+                                    src: url,
+                                    title: files[f].name.replace(/\.[^.]+$/, ''),
+                                    artist: '',
+                                    info: ''
+                                });
+                            }
+                            await updateArticleOnServer(idx);
+                        }
+                        renderList();
+                    } catch(e) { alert('Upload failed: ' + e.message); }
+                });
+            });
+
+            // Remove buttons
+            list.querySelectorAll('.remove-btn').forEach(function(btn) {
                 btn.addEventListener('click', async function() {
                     var idx = parseInt(this.dataset.idx);
                     await fetch('/api/issues/remove-article/' + idx, { method:'DELETE' });
@@ -184,13 +304,23 @@
             });
         }
 
-        genBtn.addEventListener('click', async function() {
-            genBtn.disabled = true;
-            show('gen-status','loading','Generating magazine PDF... this may take 15-30 seconds.');
+        async function updateArticleOnServer(idx) {
+            // Re-save the full issue with updated article data
+            await fetch('/api/issues/update-article', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ index: idx, article: articles[idx] })
+            });
+        }
+
+        // Generate
+        document.getElementById('generate-magazine-btn').addEventListener('click', async function() {
+            this.disabled = true;
+            show('gen-status','loading','Generating magazine PDF... may take 15-30 seconds.');
             document.getElementById('gen-result').hidden = true;
             var r = await fetch('/api/issues/generate', { method:'POST' });
             var d = await r.json();
-            genBtn.disabled = false;
+            this.disabled = false;
             if (d.success) {
                 document.getElementById('gen-status').hidden = true;
                 var res = document.getElementById('gen-result');
