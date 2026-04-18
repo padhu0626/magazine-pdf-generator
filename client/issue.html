@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issue Assembly — Magazine PDF Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/client/assets/css/admin.css">
+    <style>
+        .issue-header { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .issue-header .field { flex: 1; min-width: 200px; }
+        .article-list { margin-top: 1rem; }
+        .article-item {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px;
+            margin-bottom: 0.5rem; background: #fafafa;
+        }
+        .article-item .order { font-weight: 700; color: var(--accent); width: 24px; text-align: center; }
+        .article-item .info { flex: 1; }
+        .article-item .info .title { font-weight: 600; font-size: 0.95rem; }
+        .article-item .info .meta { font-size: 0.8rem; color: var(--muted); }
+        .article-item .template-badge {
+            font-size: 0.75rem; padding: 2px 8px; border-radius: 4px;
+            background: #fef2f2; color: var(--accent); white-space: nowrap;
+        }
+        .article-item .remove-btn {
+            background: none; border: none; color: #999; cursor: pointer; font-size: 1.2rem;
+        }
+        .article-item .remove-btn:hover { color: var(--accent); }
+        .nav-link { display: inline-block; margin-bottom: 1rem; color: var(--accent); font-size: 0.9rem; }
+        .generate-result { margin-top: 1rem; padding: 1rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; text-align: center; }
+        .generate-result a { color: var(--accent); font-weight: 600; }
+        .upload-inline { margin-top: 1rem; padding: 1rem; background: #f9fafb; border: 1px dashed var(--border); border-radius: 8px; }
+        .upload-inline input[type=file] { margin-right: 0.5rem; }
+        .template-select-inline { padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>Issue Assembly</h1>
+        <p>Create an issue, add articles, generate a complete magazine PDF</p>
+    </header>
+
+    <main class="container">
+        <a href="/" class="nav-link">&larr; Back to Single Article</a>
+
+        <!-- Issue Setup -->
+        <section class="card">
+            <h2><span class="step">1</span> Issue Setup</h2>
+            <div class="issue-header">
+                <div class="field">
+                    <label>Issue ID</label>
+                    <input type="text" id="issue-id" class="input" placeholder="2026-01" value="2026-01">
+                </div>
+                <div class="field">
+                    <label>Title</label>
+                    <input type="text" id="issue-title" class="input" placeholder="Issue Title" value="தமிழ் இதழ் — முதல் இதழ்">
+                </div>
+                <div class="field">
+                    <label>Date</label>
+                    <input type="text" id="issue-date" class="input" placeholder="April 2026" value="April 2026">
+                </div>
+            </div>
+            <div class="field" style="margin-top:0.75rem;">
+                <label>Tagline (optional)</label>
+                <input type="text" id="issue-tagline" class="input" placeholder="பண்பாடு · இலக்கியம் · தொழில்நுட்பம்">
+            </div>
+            <button class="btn btn-primary" id="create-issue-btn" style="margin-top:1rem;">Create Issue</button>
+            <div id="issue-status" class="status" hidden></div>
+        </section>
+
+        <!-- Add Articles -->
+        <section class="card" id="articles-section" hidden>
+            <h2><span class="step">2</span> Add Articles</h2>
+
+            <div class="upload-inline">
+                <input type="file" id="article-file" accept=".docx">
+                <select id="article-template" class="template-select-inline">
+                    <option value="feature-opening">Feature Opening</option>
+                    <option value="feature-continuation">Feature Continuation</option>
+                    <option value="editors-letter">Editor's Letter</option>
+                    <option value="interview">Interview</option>
+                    <option value="short-story">Short Story</option>
+                    <option value="poetry">Poetry</option>
+                    <option value="editorial">Editorial</option>
+                    <option value="photo-essay">Photo Essay</option>
+                </select>
+                <button class="btn btn-secondary" id="add-article-btn">Upload & Add</button>
+            </div>
+            <div id="add-status" class="status" hidden></div>
+
+            <div class="article-list" id="article-list">
+                <p class="muted" id="empty-msg">No articles yet. Upload .docx files above.</p>
+            </div>
+        </section>
+
+        <!-- Generate -->
+        <section class="card" id="generate-section" hidden>
+            <h2><span class="step">3</span> Generate Magazine PDF</h2>
+            <p class="muted" style="margin-bottom:1rem;">This will combine cover + TOC + all articles + back cover into one magazine PDF.</p>
+            <button class="btn btn-primary btn-large" id="generate-magazine-btn">Generate Full Magazine PDF</button>
+            <div id="gen-status" class="status" hidden></div>
+            <div id="gen-result" class="generate-result" hidden></div>
+        </section>
+    </main>
+
+    <script>
+    (function() {
+        var createBtn = document.getElementById('create-issue-btn');
+        var addBtn = document.getElementById('add-article-btn');
+        var genBtn = document.getElementById('generate-magazine-btn');
+        var articlesSection = document.getElementById('articles-section');
+        var generateSection = document.getElementById('generate-section');
+        var articleList = document.getElementById('article-list');
+        var emptyMsg = document.getElementById('empty-msg');
+        var articles = [];
+
+        createBtn.addEventListener('click', async function() {
+            var body = {
+                id: document.getElementById('issue-id').value,
+                title: document.getElementById('issue-title').value,
+                date: document.getElementById('issue-date').value,
+                tagline: document.getElementById('issue-tagline').value,
+            };
+            var r = await fetch('/api/issues/create', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+            var d = await r.json();
+            if (d.success) {
+                show('issue-status','success','Issue created!');
+                articlesSection.hidden = false;
+                generateSection.hidden = false;
+                articles = [];
+                renderList();
+            }
+        });
+
+        addBtn.addEventListener('click', async function() {
+            var file = document.getElementById('article-file').files[0];
+            var template = document.getElementById('article-template').value;
+            if (!file) { show('add-status','error','Select a .docx file'); return; }
+
+            show('add-status','loading','Uploading and parsing...');
+            var fd = new FormData();
+            fd.append('docx', file);
+            var r = await fetch('/api/upload', { method:'POST', body:fd });
+            var d = await r.json();
+            if (!d.success) { show('add-status','error',d.error); return; }
+
+            var r2 = await fetch('/api/issues/add-article', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({ article:d.article, template:template })
+            });
+            var d2 = await r2.json();
+            if (d2.success) {
+                articles.push({ ...d.article, template:template });
+                show('add-status','success','Article added! (' + d2.articleCount + ' total)');
+                document.getElementById('article-file').value = '';
+                renderList();
+            }
+        });
+
+        function renderList() {
+            if (articles.length === 0) { articleList.innerHTML = '<p class="muted">No articles yet.</p>'; return; }
+            articleList.innerHTML = articles.map(function(a, i) {
+                return '<div class="article-item">' +
+                    '<span class="order">' + (i+1) + '</span>' +
+                    '<div class="info"><div class="title">' + esc(a.title) + '</div>' +
+                    '<div class="meta">' + esc(a.author||'') + ' · ' + (a.wordCount||0) + ' words</div></div>' +
+                    '<span class="template-badge">' + esc(a.template) + '</span>' +
+                    '<button class="remove-btn" data-idx="' + i + '">&times;</button></div>';
+            }).join('');
+            articleList.querySelectorAll('.remove-btn').forEach(function(btn) {
+                btn.addEventListener('click', async function() {
+                    var idx = parseInt(this.dataset.idx);
+                    await fetch('/api/issues/remove-article/' + idx, { method:'DELETE' });
+                    articles.splice(idx, 1);
+                    renderList();
+                });
+            });
+        }
+
+        genBtn.addEventListener('click', async function() {
+            genBtn.disabled = true;
+            show('gen-status','loading','Generating magazine PDF... this may take 15-30 seconds.');
+            document.getElementById('gen-result').hidden = true;
+            var r = await fetch('/api/issues/generate', { method:'POST' });
+            var d = await r.json();
+            genBtn.disabled = false;
+            if (d.success) {
+                document.getElementById('gen-status').hidden = true;
+                var res = document.getElementById('gen-result');
+                res.hidden = false;
+                res.innerHTML = '<p style="font-weight:600;color:#166534;">Magazine PDF generated!</p>' +
+                    '<p>' + d.fileSize + ' · ~' + d.pageCount + ' pages</p>' +
+                    '<a href="' + d.pdfUrl + '" target="_blank">Download PDF</a>';
+            } else {
+                show('gen-status','error', d.error);
+            }
+        });
+
+        function show(id, type, msg) {
+            var el = document.getElementById(id);
+            el.hidden = false; el.className = 'status ' + type; el.textContent = msg;
+        }
+        function esc(s) { var d = document.createElement('div'); d.textContent = s||''; return d.innerHTML; }
+    })();
+    </script>
+</body>
+</html>

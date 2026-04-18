@@ -77,6 +77,30 @@ body {
     line-height: var(--body-line-height);
     color: var(--color-body);
     letter-spacing: var(--body-letter-spacing);
+    font-feature-settings: "liga", "clig", "calt";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+/* --- Print quality typography hardening --- */
+p, li, blockquote {
+    orphans: 3;
+    widows: 3;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    break-after: avoid;
+    page-break-after: avoid;
+}
+
+figure, blockquote, table {
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+img {
+    max-width: 100%;
+    image-rendering: auto;
 }
 
 /* --- Article structure --- */

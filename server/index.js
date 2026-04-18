@@ -6,6 +6,8 @@ const path = require('path');
 
 const uploadRoutes = require('./routes/upload');
 const renderRoutes = require('./routes/render');
+const issueRoutes = require('./routes/issues');
+const publishRoutes = require('./routes/publish');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,10 +26,17 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // API routes
 app.use('/api/upload', uploadRoutes);
 app.use('/api/render', renderRoutes);
+app.use('/api/issues', issueRoutes);
+app.use('/api/publish', publishRoutes);
 
 // Home route
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/index.html'));
+});
+
+// Issue assembly page
+app.get('/issue', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/issue.html'));
 });
 
 // Health check
