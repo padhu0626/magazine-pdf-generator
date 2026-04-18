@@ -38,22 +38,21 @@ router.post('/upload', upload.single('image'), async (req, res) => {
 
     try {
         const originalPath = req.file.path;
-        const meta = await sharp(originalPath).metadata();
+        const buffer = fs.readFileSync(originalPath);
+        const meta = await sharp(buffer).metadata();
 
-        // Optimize: resize if very large, convert to JPEG for consistency
-        const optimizedName = path.basename(originalPath, path.extname(originalPath)) + '.jpg';
-        const optimizedPath = path.join(path.dirname(originalPath), optimizedName);
+        // Always write to a new filename to avoid input===output error
+        const outputName = Date.now() + '-opt.jpg';
+        const outputPath = path.join(path.dirname(originalPath), outputName);
 
-        let pipeline = sharp(originalPath);
+        let pipeline = sharp(buffer);
         if (meta.width > 2000) pipeline = pipeline.resize(2000);
-        await pipeline.jpeg({ quality: 85 }).toFile(optimizedPath);
+        await pipeline.jpeg({ quality: 85 }).toFile(outputPath);
 
-        // Remove original if different from optimized
-        if (originalPath !== optimizedPath) {
-            fs.unlinkSync(originalPath);
-        }
+        // Remove original
+        fs.unlinkSync(originalPath);
 
-        const url = '/uploads/images/' + optimizedName;
+        const url = '/uploads/images/' + outputName;
 
         res.json({
             success: true,
