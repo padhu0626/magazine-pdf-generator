@@ -59,7 +59,7 @@ router.post('/upload', upload.single('image'), async (req, res) => {
             url: url,
             width: Math.min(meta.width, 2000),
             height: meta.height,
-            filename: optimizedName,
+            filename: outputName,
         });
     } catch (err) {
         res.status(500).json({ error: 'Image processing failed: ' + err.message });

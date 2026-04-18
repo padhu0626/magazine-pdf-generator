@@ -1,7 +1,7 @@
 {
   "id": "2026-01",
   "title": "குறிஞ்சி ",
-  "magazineName": "சங்கமம் தமிழ் பள்ளி இதழ் ",
+  "magazineName": "சங்கமம் ",
   "coverImage": "",
   "date": "April 2026",
   "tagline": "",
@@ -20,16 +20,17 @@
       "images": [],
       "wordCount": 189,
       "suggestedTemplate": "feature-opening",
-      "sourceFile": "1776481536231-sample-article.docx",
+      "sourceFile": "1776481847391-sample-article.docx",
       "parseMessages": [],
       "imageCount": 0,
-      "id": "1776481536231-sample-article",
+      "id": "1776481847391-sample-article",
       "template": "feature-opening",
-      "authorPhoto": "/uploads/images/1776481543816-urjq50.jpg",
-      "heroImage": "/uploads/images/1776481549275-4ts73z.jpg",
+      "authorPhoto": "",
+      "heroImage": "",
       "heroCaption": "",
-      "galleryPhotos": []
+      "galleryPhotos": [],
+      "order": 0
     }
   ],
-  "createdAt": "2026-04-18T03:05:26.314Z"
+  "createdAt": "2026-04-18T03:10:39.930Z"
 }
