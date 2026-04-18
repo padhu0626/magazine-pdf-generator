@@ -6,3 +6,5 @@ issues/*/articles/
 issues/*/final.pdf
 issues/*/preview.pdf
 output/
+uploads/
+test-data/*.docx
