@@ -1,21 +1,16 @@
 /**
  * Issue Composer — Assembles multiple articles into a single magazine HTML
- * that Paged.js will paginate into a complete magazine PDF.
+ * with branded headers (pennant strip + magazine name) and footers on every page.
  */
 const fs = require('fs');
 const path = require('path');
 
-/**
- * Compose a full magazine issue HTML from articles and metadata
- * @param {object} issue - Issue metadata (title, date, id)
- * @param {Array} articles - Array of parsed article objects with template assignments
- * @returns {string} Complete HTML for the full magazine
- */
+const MAGAZINE_NAME = 'தமிழ் இதழ்';
+
 function composeIssue(issue, articles) {
     const brandCss = fs.readFileSync(path.resolve(__dirname, '../../brand/brand.css'), 'utf-8');
     const masterCss = fs.readFileSync(path.resolve(__dirname, '../../templates/_master.css'), 'utf-8');
 
-    // Load all needed template CSS
     const templateCssSet = new Set(articles.map(a => a.template || 'feature-opening'));
     templateCssSet.add('cover');
     templateCssSet.add('toc');
@@ -29,17 +24,17 @@ function composeIssue(issue, articles) {
         }
     }
 
-    // Build page sections
-    const coverHtml = buildCover(issue, articles);
-    const tocHtml = buildToc(issue, articles);
-    const articlesHtml = articles.map((a, idx) => buildArticleSection(a, idx)).join('\n');
-    const backCoverHtml = buildBackCover(issue);
+    const magazineName = issue.magazineName || MAGAZINE_NAME;
+    const coverHtml = buildCover(issue, articles, magazineName);
+    const tocHtml = buildToc(issue, articles, magazineName);
+    const articlesHtml = articles.map((a, idx) => buildArticleSection(a, idx, issue, magazineName)).join('\n');
+    const backCoverHtml = buildBackCover(issue, magazineName);
 
     return `<!DOCTYPE html>
 <html lang="ta">
 <head>
 <meta charset="UTF-8">
-<title>${escapeHtml(issue.title || 'தமிழ் இதழ்')} — ${escapeHtml(issue.id || '')}</title>
+<title>${escapeHtml(magazineName)} — ${escapeHtml(issue.id || '')}</title>
 <style>
 ${brandCss}
 ${masterCss}
@@ -55,7 +50,33 @@ ${backCoverHtml}
 </html>`;
 }
 
-function buildCover(issue, articles) {
+function buildPageHeader(pageNum, magazineName, sectionLabel, authorName) {
+    return `
+    <div class="pennant-triangles"></div>
+    <div class="header-bar">
+        <div class="header-page-num">${pageNum || ''}</div>
+        <div class="header-magazine-name">${escapeHtml(magazineName)}</div>
+        <div class="header-article-info">
+            ${sectionLabel ? `<span class="section-name">${escapeHtml(sectionLabel)}</span>` : ''}
+            ${authorName ? `<br>${escapeHtml(authorName)}` : ''}
+        </div>
+    </div>`;
+}
+
+function buildPageFooter(magazineName, issueDate, website) {
+    return `
+    <div class="page-footer">
+        <div class="footer-left">${escapeHtml(website || '')}</div>
+        <div class="footer-center">
+            ${escapeHtml(magazineName)}
+            <span class="footer-dot"></span>
+            ${escapeHtml(issueDate || '')}
+        </div>
+        <div class="footer-right">${escapeHtml(website || '')}</div>
+    </div>`;
+}
+
+function buildCover(issue, articles, magazineName) {
     const teasers = articles.slice(0, 3).map(a =>
         `<p class="teaser">${escapeHtml(a.title)}</p>`
     ).join('\n');
@@ -65,21 +86,30 @@ function buildCover(issue, articles) {
     <div class="cover-overlay"></div>
     <div class="cover-content">
         <div class="cover-masthead">
-            <div class="logo-text">தமிழ் இதழ்</div>
-            <div class="issue-info">${escapeHtml(issue.id || 'Issue 01')} &middot; ${escapeHtml(issue.date || 'April 2026')}</div>
+            <div class="magazine-name">${escapeHtml(magazineName)}</div>
+            <div class="magazine-subtitle">TAMIL MAGAZINE</div>
+            <div class="issue-info">
+                <span>${escapeHtml(issue.id || 'Issue 01')}</span>
+                <span class="dot"></span>
+                <span>${escapeHtml(issue.date || 'April 2026')}</span>
+            </div>
             <div class="gold-line"></div>
         </div>
         <div class="cover-theme">
-            <h1>${escapeHtml(issue.title || 'தமிழ் இதழ்')}</h1>
+            <h1>${escapeHtml(issue.title || magazineName)}</h1>
             ${issue.tagline ? `<p class="tagline">${escapeHtml(issue.tagline)}</p>` : ''}
         </div>
         <div class="cover-teasers">${teasers}</div>
     </div>
+    <div class="cover-bottom-bar">
+        <span>${escapeHtml(issue.date || 'April 2026')}</span>
+        <span>${escapeHtml(magazineName)}</span>
+    </div>
 </div>`;
 }
 
-function buildToc(issue, articles) {
-    let pageNum = 3; // Cover=1, TOC=2, first article starts at 3
+function buildToc(issue, articles, magazineName) {
+    let pageNum = 3;
     const items = articles.map((a, idx) => {
         const item = `
         <li class="toc-item">
@@ -90,46 +120,53 @@ function buildToc(issue, articles) {
             </div>
             <span class="toc-page-num">${pageNum}</span>
         </li>`;
-        pageNum += Math.max(1, Math.ceil((a.wordCount || 300) / 500)); // estimate pages
+        pageNum += Math.max(1, Math.ceil((a.wordCount || 300) / 500));
         return item;
     }).join('\n');
 
     return `
 <article class="toc-page">
+    ${buildPageHeader('2', magazineName, 'உள்ளடக்கம்', '')}
     <header class="toc-header">
-        <div class="logo-small">தமிழ் இதழ்</div>
+        <div class="logo-small">${escapeHtml(magazineName)}</div>
         <h1>உள்ளடக்கம்</h1>
     </header>
     <ul class="toc-list">${items}</ul>
+    ${buildPageFooter(magazineName, issue.date, '')}
 </article>`;
 }
 
-function buildArticleSection(article, index) {
+function buildArticleSection(article, index, issue, magazineName) {
     const template = article.template || 'feature-opening';
     let bodyHtml = article.bodyHtml || '';
+    const pageNum = index + 3;
 
     // Insert pull quote
     if (article.pullQuotes && article.pullQuotes.length > 0 && !bodyHtml.includes('pull-quote')) {
         const pq = `<blockquote class="pull-quote">"${escapeHtml(article.pullQuotes[0])}"</blockquote>`;
         const paras = bodyHtml.split('</p>');
-        if (paras.length > 2) {
-            paras.splice(2, 0, pq);
-            bodyHtml = paras.join('</p>');
-        }
+        if (paras.length > 2) { paras.splice(2, 0, pq); bodyHtml = paras.join('</p>'); }
     }
+
+    const header = buildPageHeader(pageNum, magazineName, article.category || '', article.author || '');
+    const footer = buildPageFooter(magazineName, issue.date, '');
 
     switch (template) {
         case 'editors-letter':
             return `
 <article class="editors-letter">
+    ${header}
     <header class="letter-header"><h1>ஆசிரியர் கடிதம்</h1><div class="accent-bar"></div></header>
+    ${article.editorPhoto ? `<div class="editor-photo-wrap"><img class="editor-portrait" src="${escapeHtml(article.editorPhoto)}" alt=""><div class="editor-name-label">${escapeHtml(article.author || '')}</div></div>` : ''}
     <div class="letter-body">${bodyHtml}</div>
     ${article.author ? `<div class="signature">${escapeHtml(article.author)}<div class="title">ஆசிரியர்</div></div>` : ''}
+    ${footer}
 </article>`;
 
         case 'interview':
             return `
 <article class="interview-page">
+    ${header}
     <header class="interview-header">
         <span class="category-tag">INTERVIEW &middot; நேர்காணல்</span>
         <h1>${escapeHtml(article.title)}</h1>
@@ -137,44 +174,52 @@ function buildArticleSection(article, index) {
         ${article.author ? `<p class="byline">நேர்காணல்: ${escapeHtml(article.author)}</p>` : ''}
     </header>
     <div class="interview-body">${bodyHtml}</div>
+    ${footer}
 </article>`;
 
         case 'short-story':
             return `
 <article class="short-story">
+    ${header}
     <header class="story-header">
         <span class="genre-tag">Fiction &middot; சிறுகதை</span>
         <h1>${escapeHtml(article.title)}</h1>
         ${article.author ? `<p class="byline">${escapeHtml(article.author)}</p>` : ''}
     </header>
-    <div class="story-body">${bodyHtml}<p class="end-mark" style="text-align:center;margin-top:16pt;color:#c9a961;">&#x2766;</p></div>
+    <div class="story-body">${bodyHtml}<div class="end-mark">வி</div></div>
+    ${footer}
 </article>`;
 
         case 'poetry':
             return `
 <article class="poetry-page">
+    ${header}
     <header class="poetry-header">
         <span class="genre-tag">Poetry &middot; கவிதை</span>
         <h1>${escapeHtml(article.title)}</h1>
     </header>
     <div class="poem"><div class="poem-body">${bodyHtml}</div>
     ${article.author ? `<div class="poet-credit">— ${escapeHtml(article.author)}</div>` : ''}</div>
+    ${footer}
 </article>`;
 
         case 'editorial':
             return `
 <article class="editorial-page">
+    ${header}
     <header class="editorial-header">
         <span class="opinion-tag">Opinion &middot; கருத்து</span>
         <h1>${escapeHtml(article.title)}</h1>
         ${article.author ? `<div class="byline"><div class="author-info"><div class="name">${escapeHtml(article.author)}</div></div></div>` : ''}
     </header>
     <div class="editorial-body">${bodyHtml}</div>
+    ${footer}
 </article>`;
 
         default: // feature-opening, feature-continuation
             return `
 <article class="${template}">
+    ${header}
     <header class="feature-hero">
         ${article.category ? `<span class="category-tag">${escapeHtml(article.category)}</span>` : ''}
         <hr class="accent-line">
@@ -183,23 +228,28 @@ function buildArticleSection(article, index) {
         ${article.author ? `<p class="byline"><span class="author-name">${escapeHtml(article.author)}</span></p>` : ''}
     </header>
     <div class="article-body">${bodyHtml}</div>
-    <p class="end-mark">&#x2766;</p>
+    <div class="end-mark">வி</div>
+    ${footer}
 </article>`;
     }
 }
 
-function buildBackCover(issue) {
+function buildBackCover(issue, magazineName) {
     return `
 <div class="back-cover">
-    <div class="next-issue">
-        <p class="label">Coming Next</p>
-        <h2>அடுத்த இதழில்</h2>
-        <p class="teaser">மேலும் சிறந்த கட்டுரைகள் வரவிருக்கின்றன</p>
+    <div class="back-top">
+        <div class="back-magazine-name">${escapeHtml(magazineName)}</div>
+        <div class="back-tagline">TAMIL MAGAZINE</div>
+        <div class="back-gold-line"></div>
+        <div class="next-issue">
+            <p class="label">Coming Next</p>
+            <h2>அடுத்த இதழில்</h2>
+            <p class="teaser">மேலும் சிறந்த கட்டுரைகள் வரவிருக்கின்றன</p>
+        </div>
     </div>
-    <div class="motif">● ● ●</div>
-    <div class="credits">
-        <div class="magazine-name">தமிழ் இதழ்</div>
-        <div class="info">${escapeHtml(issue.id || 'Issue 01')} &middot; ${escapeHtml(issue.date || 'April 2026')}</div>
+    <div class="back-bottom">
+        <div class="issue-id">${escapeHtml(issue.id || '')} &middot; ${escapeHtml(issue.date || '')}</div>
+        <div class="credits">Published by ${escapeHtml(magazineName)}</div>
     </div>
 </div>`;
 }

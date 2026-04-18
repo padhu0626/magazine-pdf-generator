@@ -1,67 +1,32 @@
 /* ========================================
-   Master Layout — CSS Paged Media Rules
-   A4 magazine, facing pages, folios
+   Master Layout — Vikatan-style magazine
+   A4, facing pages, branded headers/footers
    ======================================== */
 
 /* --- Page dimensions --- */
 @page {
     size: A4;
-    margin: 20mm 16mm 22mm 16mm;
+    margin: 12mm 14mm 18mm 14mm;
 
-    @bottom-center {
-        content: counter(page);
-        font-family: var(--font-english);
-        font-size: 8pt;
-        color: var(--color-muted);
-    }
-}
-
-/* Left (verso) pages */
-@page :left {
-    margin-left: 20mm;
-    margin-right: 16mm;
-
-    @top-left {
-        content: var(--magazine-name, 'தமிழ் இதழ்');
-        font-family: var(--font-tamil-display);
-        font-size: 8pt;
-        color: var(--color-muted);
-    }
-
-    @bottom-center {
-        content: counter(page);
-    }
-}
-
-/* Right (recto) pages */
-@page :right {
-    margin-left: 16mm;
-    margin-right: 20mm;
-
-    @top-right {
-        content: var(--article-title, '');
-        font-family: var(--font-tamil-body);
-        font-size: 8pt;
-        color: var(--color-muted);
-    }
-
-    @bottom-center {
-        content: counter(page);
-    }
-}
-
-/* First page of each article — no running header */
-@page article-first {
     @top-left { content: none; }
     @top-right { content: none; }
+    @bottom-left { content: none; }
+    @bottom-right { content: none; }
+    @bottom-center { content: none; }
 }
 
-/* Cover page — no margins, no folios */
+@page :left {
+    margin-left: 16mm;
+    margin-right: 14mm;
+}
+
+@page :right {
+    margin-left: 14mm;
+    margin-right: 16mm;
+}
+
 @page cover {
     margin: 0;
-    @top-left { content: none; }
-    @top-right { content: none; }
-    @bottom-center { content: none; }
 }
 
 /* --- Base typography --- */
@@ -82,37 +47,143 @@ body {
     text-rendering: optimizeLegibility;
 }
 
-/* --- Print quality typography hardening --- */
-p, li, blockquote {
-    orphans: 3;
-    widows: 3;
+/* --- Print quality --- */
+p, li, blockquote { orphans: 3; widows: 3; }
+h1, h2, h3, h4, h5, h6 { break-after: avoid; page-break-after: avoid; }
+figure, blockquote, table { break-inside: avoid; page-break-inside: avoid; }
+img { max-width: 100%; image-rendering: auto; }
+
+/* ================================================
+   BRANDED PAGE HEADER — appears on every article page
+   Colorful pennant/bunting strip + magazine name
+   ================================================ */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8pt;
+    position: relative;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    break-after: avoid;
-    page-break-after: avoid;
+/* Colorful pennant/bunting strip */
+.pennant-strip {
+    width: 100%;
+    height: 10pt;
+    background: repeating-linear-gradient(
+        90deg,
+        #c62828 0px, #c62828 8px,
+        #ff9800 8px, #ff9800 16px,
+        #4caf50 16px, #4caf50 24px,
+        #2196f3 24px, #2196f3 32px,
+        #9c27b0 32px, #9c27b0 40px,
+        #ffeb3b 40px, #ffeb3b 48px
+    );
+    margin-bottom: 4pt;
 }
 
-figure, blockquote, table {
-    break-inside: avoid;
-    page-break-inside: avoid;
+/* Triangular pennant version */
+.pennant-triangles {
+    width: 100%;
+    height: 14pt;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='14' viewBox='0 0 24 14'%3E%3Cpolygon points='0,0 12,14 24,0' fill='%23c62828'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='14' viewBox='0 0 24 14'%3E%3Cpolygon points='0,0 12,14 24,0' fill='%234caf50'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='14' viewBox='0 0 24 14'%3E%3Cpolygon points='0,0 12,14 24,0' fill='%23ff9800'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='14' viewBox='0 0 24 14'%3E%3Cpolygon points='0,0 12,14 24,0' fill='%232196f3'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='14' viewBox='0 0 24 14'%3E%3Cpolygon points='0,0 12,14 24,0' fill='%239c27b0'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='14' viewBox='0 0 24 14'%3E%3Cpolygon points='0,0 12,14 24,0' fill='%23ffeb3b'/%3E%3C/svg%3E");
+    background-size: 24px 14px;
+    background-position: 0 0, 24px 0, 48px 0, 72px 0, 96px 0, 120px 0;
+    background-repeat: repeat-x;
+    margin-bottom: 4pt;
 }
 
-img {
-    max-width: 100%;
-    image-rendering: auto;
+.header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2pt 0;
 }
 
-/* --- Article structure --- */
+.header-page-num {
+    font-family: var(--font-english);
+    font-size: 11pt;
+    font-weight: 700;
+    color: #fff;
+    background: var(--color-accent);
+    width: 22pt;
+    height: 22pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2pt;
+}
+
+.header-magazine-name {
+    font-family: var(--font-tamil-display);
+    font-size: 18pt;
+    font-weight: 900;
+    color: var(--color-accent);
+}
+
+.header-article-info {
+    font-family: var(--font-tamil-body);
+    font-size: 8pt;
+    color: var(--color-muted);
+    text-align: right;
+}
+
+.header-article-info .section-name {
+    font-weight: 700;
+    color: var(--color-accent);
+}
+
+/* ================================================
+   BRANDED PAGE FOOTER — magazine name + date + web
+   ================================================ */
+.page-footer {
+    position: relative;
+    margin-top: auto;
+    padding-top: 8pt;
+    border-top: 0.5pt solid var(--color-divider);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 8pt;
+    color: var(--color-muted);
+}
+
+.page-footer .footer-left {
+    font-family: var(--font-english);
+}
+
+.page-footer .footer-center {
+    display: flex;
+    align-items: center;
+    gap: 4pt;
+    font-family: var(--font-tamil-display);
+    font-weight: 700;
+    font-size: 9pt;
+    color: var(--color-body);
+}
+
+.page-footer .footer-dot {
+    width: 4pt;
+    height: 4pt;
+    background: var(--color-accent);
+    border-radius: 50%;
+}
+
+.page-footer .footer-right {
+    font-family: var(--font-english);
+}
+
+/* ================================================
+   HEADINGS
+   ================================================ */
 article {
     break-before: page;
 }
 
-article:first-of-type {
-    page: article-first;
-}
-
-/* --- Headings --- */
 h1 {
     font-family: var(--font-tamil-display);
     font-size: var(--h1-size);
@@ -154,7 +225,9 @@ h4 {
     margin-bottom: 4pt;
 }
 
-/* --- Body text --- */
+/* ================================================
+   ARTICLE BODY — 2 column
+   ================================================ */
 .article-body {
     column-count: 2;
     column-gap: 6mm;
@@ -164,20 +237,11 @@ h4 {
     hyphens: manual;
 }
 
-.article-body p {
-    margin-bottom: 6pt;
-    text-indent: 0;
-}
+.article-body p { margin-bottom: 6pt; text-indent: 0; }
+.article-body p + p { text-indent: 1.5em; }
 
-.article-body p + p {
-    text-indent: 1.5em;
-}
-
-/* --- Drop cap --- */
-.article-body > p:first-of-type {
-    text-indent: 0;
-}
-
+/* Drop cap */
+.article-body > p:first-of-type { text-indent: 0; }
 .article-body > p:first-of-type::first-letter {
     font-family: var(--font-tamil-display);
     font-size: 3.4em;
@@ -187,9 +251,11 @@ h4 {
     margin-top: 0.05em;
     color: var(--color-accent);
     font-weight: 900;
+    background: var(--color-cream);
+    padding: 2pt 4pt;
 }
 
-/* --- Pull quote --- */
+/* Pull quote */
 .pull-quote {
     column-span: all;
     font-family: var(--font-tamil-display);
@@ -203,18 +269,9 @@ h4 {
     font-weight: 600;
 }
 
-/* --- Images --- */
-figure {
-    break-inside: avoid;
-    margin: 10pt 0;
-}
-
-figure img {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-
+/* Images */
+figure { break-inside: avoid; margin: 10pt 0; }
+figure img { width: 100%; height: auto; display: block; }
 figcaption {
     font-family: var(--font-tamil-body);
     font-size: 8pt;
@@ -224,7 +281,7 @@ figcaption {
     font-style: italic;
 }
 
-/* --- Byline --- */
+/* Byline */
 .byline {
     font-family: var(--font-tamil-body);
     font-size: 10pt;
@@ -233,7 +290,7 @@ figcaption {
     font-weight: 500;
 }
 
-/* --- Decorative divider --- */
+/* Divider */
 .divider {
     text-align: center;
     margin: 16pt 0;
@@ -242,11 +299,24 @@ figcaption {
     letter-spacing: 0.3em;
 }
 
-/* --- Page break utilities --- */
-.page-break {
-    break-before: page;
+/* End mark */
+.end-mark {
+    text-align: center;
+    margin-top: 12pt;
+    color: var(--color-accent);
+    font-size: 10pt;
+    font-weight: 700;
+    background: var(--color-accent);
+    color: #fff;
+    width: 16pt;
+    height: 16pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    font-family: var(--font-tamil-display);
 }
 
-.avoid-break {
-    break-inside: avoid;
-}
+/* Page break utility */
+.page-break { break-before: page; }
+.avoid-break { break-inside: avoid; }

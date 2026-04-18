@@ -1,4 +1,4 @@
-/* Template 12: Back Cover */
+/* Template 12: Back Cover — Branded */
 .back-cover {
     page: cover;
     position: relative;
@@ -9,28 +9,59 @@
     color: #fff;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    padding: 0;
+}
+
+.back-cover .back-top {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     padding: 20mm;
+}
+
+.back-cover .back-magazine-name {
+    font-family: var(--font-tamil-display);
+    font-size: 42pt;
+    font-weight: 900;
+    margin-bottom: 8pt;
+    text-align: center;
+}
+
+.back-cover .back-tagline {
+    font-family: var(--font-english);
+    font-size: 10pt;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 24pt;
+}
+
+.back-cover .back-gold-line {
+    width: 60pt;
+    height: 2pt;
+    background: var(--color-gold);
+    margin-bottom: 24pt;
 }
 
 .back-cover .next-issue {
     text-align: center;
-    margin-bottom: auto;
-    padding-top: 80mm;
 }
 
 .back-cover .next-issue .label {
     font-family: var(--font-english);
-    font-size: 9pt;
+    font-size: 8pt;
     text-transform: uppercase;
     letter-spacing: 0.2em;
     color: var(--color-gold);
-    margin-bottom: 10pt;
+    margin-bottom: 8pt;
 }
 
 .back-cover .next-issue h2 {
     font-family: var(--font-tamil-display);
-    font-size: 22pt;
+    font-size: 20pt;
     font-weight: 700;
     color: #fff;
     margin-bottom: 6pt;
@@ -43,29 +74,22 @@
     line-height: 1.5;
 }
 
-.back-cover .credits {
-    border-top: 0.5pt solid rgba(255,255,255,0.2);
-    padding-top: 12pt;
+.back-cover .back-bottom {
+    background: rgba(0,0,0,0.3);
+    padding: 10mm 20mm;
     text-align: center;
 }
 
-.back-cover .credits .magazine-name {
-    font-family: var(--font-tamil-display);
-    font-size: 16pt;
-    font-weight: 700;
-    margin-bottom: 6pt;
-}
-
-.back-cover .credits .info {
+.back-cover .back-bottom .credits {
     font-family: var(--font-english);
     font-size: 8pt;
     opacity: 0.5;
-    line-height: 1.6;
+    line-height: 1.8;
 }
 
-.back-cover .motif {
-    text-align: center;
-    margin: 16pt 0;
-    color: var(--color-gold);
-    font-size: 12pt;
+.back-cover .back-bottom .issue-id {
+    font-family: var(--font-tamil-body);
+    font-size: 10pt;
+    margin-bottom: 4pt;
+    opacity: 0.7;
 }

@@ -1,4 +1,4 @@
-/* Template 3: Editor's Letter */
+/* Template 3: Editor's Letter — with passport photo support */
 .editors-letter {
     page: article-first;
     break-after: page;
@@ -6,7 +6,8 @@
 
 .editors-letter .letter-header {
     text-align: center;
-    margin-bottom: 20pt;
+    margin-bottom: 16pt;
+    position: relative;
 }
 
 .editors-letter .letter-header h1 {
@@ -24,15 +25,29 @@
     margin: 0 auto;
 }
 
+/* Editor passport photo — top right */
+.editors-letter .editor-photo-wrap {
+    float: right;
+    margin: 0 0 12pt 14pt;
+    text-align: center;
+}
+
 .editors-letter .editor-portrait {
-    float: left;
-    width: 80pt;
-    height: 80pt;
-    border-radius: 50%;
+    width: 70pt;
+    height: 85pt;
     object-fit: cover;
-    margin: 0 14pt 10pt 0;
     border: 2pt solid var(--color-gold);
+    border-radius: 4pt;
     background: var(--color-cream);
+    display: block;
+}
+
+.editors-letter .editor-name-label {
+    font-family: var(--font-tamil-body);
+    font-size: 7pt;
+    color: var(--color-muted);
+    margin-top: 3pt;
+    font-weight: 600;
 }
 
 .editors-letter .letter-body {
@@ -54,6 +69,8 @@
     margin-top: 0.05em;
     color: var(--color-accent);
     font-weight: 900;
+    background: var(--color-cream);
+    padding: 2pt 4pt;
 }
 
 .editors-letter .signature {

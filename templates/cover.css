@@ -1,4 +1,4 @@
-/* Template 1: Cover Page */
+/* Template 1: Cover Page — Full-bleed magazine cover */
 .cover-page {
     page: cover;
     position: relative;
@@ -16,13 +16,19 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.4;
 }
 
+/* Dark gradient overlay for text readability */
 .cover-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(26,26,46,0.3) 0%, rgba(26,26,46,0.85) 60%, rgba(26,26,46,0.95) 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(0,0,0,0.5) 0%,
+        rgba(0,0,0,0.1) 30%,
+        rgba(0,0,0,0.1) 60%,
+        rgba(0,0,0,0.7) 100%
+    );
 }
 
 .cover-content {
@@ -31,77 +37,118 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 20mm 16mm;
+    padding: 12mm 14mm;
 }
 
+/* Magazine name — BIG, like Ananda Vikatan masthead */
 .cover-masthead {
     text-align: center;
-    margin-bottom: auto;
 }
 
-.cover-masthead .logo-text {
+.cover-masthead .magazine-name {
     font-family: var(--font-tamil-display);
-    font-size: 48pt;
+    font-size: 56pt;
     font-weight: 900;
-    letter-spacing: 0.02em;
-    margin-bottom: 4pt;
+    letter-spacing: 0.03em;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+    margin-bottom: 2pt;
+    line-height: 1.1;
+}
+
+.cover-masthead .magazine-subtitle {
+    font-family: var(--font-english);
+    font-size: 10pt;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    opacity: 0.8;
 }
 
 .cover-masthead .issue-info {
-    font-family: var(--font-english);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8pt;
+    margin-top: 6pt;
+    font-family: var(--font-tamil-body);
     font-size: 10pt;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    opacity: 0.7;
+    opacity: 0.85;
+}
+
+.cover-masthead .issue-info .dot {
+    width: 4pt;
+    height: 4pt;
+    background: var(--color-gold);
+    border-radius: 50%;
 }
 
 .cover-masthead .gold-line {
-    width: 60pt;
+    width: 80pt;
     height: 2pt;
     background: var(--color-gold);
-    margin: 10pt auto 0;
+    margin: 8pt auto 0;
 }
 
+/* Issue theme — middle/bottom area */
 .cover-theme {
+    margin-top: auto;
+    margin-bottom: 20mm;
     text-align: center;
-    margin-bottom: 30mm;
 }
 
 .cover-theme h1 {
     font-family: var(--font-tamil-display);
-    font-size: 28pt;
-    font-weight: 700;
+    font-size: 32pt;
+    font-weight: 800;
     color: #fff;
     line-height: 1.2;
     margin-bottom: 8pt;
+    text-shadow: 1px 1px 6px rgba(0,0,0,0.5);
 }
 
 .cover-theme .tagline {
     font-family: var(--font-tamil-body);
     font-size: 12pt;
-    opacity: 0.8;
-    font-weight: 400;
+    opacity: 0.85;
 }
 
+/* Teaser headlines at bottom */
 .cover-teasers {
     border-top: 0.5pt solid rgba(255,255,255,0.3);
-    padding-top: 12pt;
+    padding-top: 10pt;
 }
 
 .cover-teasers .teaser {
     font-family: var(--font-tamil-body);
     font-size: 10pt;
-    margin-bottom: 6pt;
+    margin-bottom: 5pt;
     padding-left: 12pt;
     position: relative;
-    opacity: 0.85;
+    opacity: 0.9;
 }
 
 .cover-teasers .teaser::before {
-    content: '●';
+    content: '';
     position: absolute;
     left: 0;
-    color: var(--color-gold);
-    font-size: 6pt;
-    top: 3pt;
+    top: 5pt;
+    width: 5pt;
+    height: 5pt;
+    background: var(--color-gold);
+    border-radius: 50%;
+}
+
+/* Price/barcode area */
+.cover-bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.5);
+    padding: 4pt 14mm;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-english);
+    font-size: 8pt;
+    color: rgba(255,255,255,0.7);
 }
