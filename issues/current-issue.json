@@ -1,6 +1,6 @@
 {
   "id": "2026-01",
-  "title": "தமிழ் இதழ் — முதல் இதழ்",
+  "title": "சங்கமம் தமிழ் பள்ளி இதழ் - முதல் இதழ்",
   "date": "April 2026",
   "tagline": "",
   "articles": [
@@ -18,13 +18,13 @@
       "images": [],
       "wordCount": 189,
       "suggestedTemplate": "feature-opening",
-      "sourceFile": "1776478377725-sample-article.docx",
+      "sourceFile": "1776480389674-sample-article.docx",
       "parseMessages": [],
       "imageCount": 0,
-      "id": "1776478377725-sample-article",
+      "id": "1776480389674-sample-article",
       "template": "editorial",
       "order": 0
     }
   ],
-  "createdAt": "2026-04-18T02:12:07.792Z"
+  "createdAt": "2026-04-18T02:46:15.492Z"
 }

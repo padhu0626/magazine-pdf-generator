@@ -35,10 +35,11 @@ loadIssue();
  * POST /api/issues/create — Create a new issue
  */
 router.post('/create', (req, res) => {
-    const { id, title, date, tagline } = req.body;
+    const { id, title, magazineName, date, tagline } = req.body;
     currentIssue = {
         id: id || `issue-${Date.now()}`,
-        title: title || 'தமிழ் இதழ்',
+        title: title || '',
+        magazineName: magazineName || title || 'Magazine',
         date: date || new Date().toLocaleDateString('ta-IN'),
         tagline: tagline || '',
         articles: [],

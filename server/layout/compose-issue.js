@@ -5,8 +5,6 @@
 const fs = require('fs');
 const path = require('path');
 
-const MAGAZINE_NAME = 'தமிழ் இதழ்';
-
 function composeIssue(issue, articles) {
     const brandCss = fs.readFileSync(path.resolve(__dirname, '../../brand/brand.css'), 'utf-8');
     const masterCss = fs.readFileSync(path.resolve(__dirname, '../../templates/_master.css'), 'utf-8');
@@ -25,7 +23,7 @@ function composeIssue(issue, articles) {
         }
     }
 
-    const magazineName = issue.magazineName || MAGAZINE_NAME;
+    const magazineName = issue.magazineName || issue.title || 'Magazine';
     const coverHtml = buildCover(issue, articles, magazineName);
     const tocHtml = buildToc(issue, articles, magazineName);
     const articlesHtml = articles.map((a, idx) => buildArticleSection(a, idx, issue, magazineName)).join('\n');

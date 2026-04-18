@@ -47,14 +47,18 @@
         <!-- Issue Setup -->
         <section class="card">
             <h2><span class="step">1</span> Issue Setup</h2>
+            <div class="field">
+                <label>Magazine Name (appears on every page, cover, footer)</label>
+                <input type="text" id="magazine-name" class="input" placeholder="Your Magazine Name" value="" style="font-size:1.2rem;font-weight:700;">
+            </div>
             <div class="issue-header">
                 <div class="field">
                     <label>Issue ID</label>
                     <input type="text" id="issue-id" class="input" placeholder="2026-01" value="2026-01">
                 </div>
                 <div class="field">
-                    <label>Title</label>
-                    <input type="text" id="issue-title" class="input" placeholder="Issue Title" value="தமிழ் இதழ் — முதல் இதழ்">
+                    <label>Issue Title</label>
+                    <input type="text" id="issue-title" class="input" placeholder="Issue theme/title" value="">
                 </div>
                 <div class="field">
                     <label>Date</label>
@@ -120,6 +124,7 @@
             var body = {
                 id: document.getElementById('issue-id').value,
                 title: document.getElementById('issue-title').value,
+                magazineName: document.getElementById('magazine-name').value,
                 date: document.getElementById('issue-date').value,
                 tagline: document.getElementById('issue-tagline').value,
             };

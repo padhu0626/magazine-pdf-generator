@@ -82,7 +82,7 @@ function buildHtmlFromArticle(article, templateName) {
     <div class="cover-overlay"></div>
     <div class="cover-content">
         <div class="cover-masthead">
-            <div class="logo-text">தமிழ் இதழ்</div>
+            <div class="logo-text">${escapeHtml(article.magazineName || article.title || 'Magazine')}</div>
             <div class="issue-info">Issue 01 &middot; April 2026</div>
             <div class="gold-line"></div>
         </div>
@@ -191,7 +191,7 @@ function buildHtmlFromArticle(article, templateName) {
     </div>
     <div class="motif">● ● ●</div>
     <div class="credits">
-        <div class="magazine-name">தமிழ் இதழ்</div>
+        <div class="magazine-name">${escapeHtml(article.magazineName || article.title || 'Magazine')}</div>
         <div class="info">Issue 01 &middot; April 2026</div>
     </div>
 </div>`;
@@ -216,13 +216,13 @@ function buildHtmlFromArticle(article, templateName) {
 <html lang="ta">
 <head>
 <meta charset="UTF-8">
-<title>${escapeHtml(article.title)} — தமிழ் இதழ்</title>
+<title>${escapeHtml(article.title)} — ${escapeHtml(article.magazineName || article.title || 'Magazine')}</title>
 <link rel="stylesheet" href="${brandCssPath}">
 <link rel="stylesheet" href="${masterCssPath}">
 <link rel="stylesheet" href="${templateCssPath}">
 <style>
 :root {
-    --magazine-name: 'தமிழ் இதழ்';
+    --magazine-name: '${escapeHtml(article.magazineName || article.title || 'Magazine')}';
     --article-title: '${escapeHtml(article.title)}';
     --issue-date: 'ஏப்ரல் 2026';
 }
