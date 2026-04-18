@@ -269,22 +269,14 @@ figcaption {
     letter-spacing: 0.3em;
 }
 
-/* End mark */
+/* End mark — small square at end of article */
 .end-mark {
-    text-align: center;
-    margin-top: 12pt;
-    color: var(--color-accent);
-    font-size: 10pt;
-    font-weight: 700;
+    display: inline-block;
+    width: 8pt;
+    height: 8pt;
     background: var(--color-accent);
-    color: #fff;
-    width: 16pt;
-    height: 16pt;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: auto;
-    font-family: var(--font-tamil-display);
+    margin-left: 4pt;
+    vertical-align: middle;
 }
 
 /* Page break utility */

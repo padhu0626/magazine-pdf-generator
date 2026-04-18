@@ -226,7 +226,7 @@ function buildArticleSection(article, index, issue, magazineName) {
         <h1>${escapeHtml(article.title)}</h1>
         ${article.author ? `<p class="byline">${escapeHtml(article.author)}</p>` : ''}
     </header>
-    <div class="story-body">${bodyHtml}<div class="end-mark">வி</div></div>
+    <div class="story-body">${bodyHtml} <span class="end-mark"></span></div>
     ${footer}
 </article>`;
 
@@ -281,8 +281,7 @@ function buildArticleSection(article, index, issue, magazineName) {
         ${article.subtitle ? `<p class="subtitle">${escapeHtml(article.subtitle)}</p>` : ''}
     </header>
     ${buildAuthorBlock(article)}
-    <div class="article-body">${bodyHtml}</div>
-    <div class="end-mark">வி</div>
+    <div class="article-body">${bodyHtml} <span class="end-mark"></span></div>
     ${footer}
 </article>`;
     }

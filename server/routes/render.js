@@ -129,7 +129,7 @@ function buildHtmlFromArticle(article, templateName) {
         ${article.author ? `<p class="byline">${escapeHtml(article.author)}</p>` : ''}
     </header>
     <div class="story-body">${bodyHtml}
-        <p class="end-mark" style="text-align:center;margin-top:16pt;color:#c9a961;">&#x2766;</p>
+        <span class="end-mark"></span>
     </div>
 </article>`;
             break;
@@ -208,7 +208,7 @@ function buildHtmlFromArticle(article, templateName) {
         ${article.author ? `<p class="byline"><span class="author-name">${escapeHtml(article.author)}</span> &middot; ஏப்ரல் 2026</p>` : ''}
     </header>
     <div class="article-body">${bodyHtml}</div>
-    <p class="end-mark">&#x2766;</p>
+    <span class="end-mark"></span>
 </article>`;
     }
 
