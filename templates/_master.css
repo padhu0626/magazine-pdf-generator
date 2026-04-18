@@ -1,0 +1,228 @@
+/* ========================================
+   Master Layout — CSS Paged Media Rules
+   A4 magazine, facing pages, folios
+   ======================================== */
+
+/* --- Page dimensions --- */
+@page {
+    size: A4;
+    margin: 20mm 16mm 22mm 16mm;
+
+    @bottom-center {
+        content: counter(page);
+        font-family: var(--font-english);
+        font-size: 8pt;
+        color: var(--color-muted);
+    }
+}
+
+/* Left (verso) pages */
+@page :left {
+    margin-left: 20mm;
+    margin-right: 16mm;
+
+    @top-left {
+        content: var(--magazine-name, 'தமிழ் இதழ்');
+        font-family: var(--font-tamil-display);
+        font-size: 8pt;
+        color: var(--color-muted);
+    }
+
+    @bottom-center {
+        content: counter(page);
+    }
+}
+
+/* Right (recto) pages */
+@page :right {
+    margin-left: 16mm;
+    margin-right: 20mm;
+
+    @top-right {
+        content: var(--article-title, '');
+        font-family: var(--font-tamil-body);
+        font-size: 8pt;
+        color: var(--color-muted);
+    }
+
+    @bottom-center {
+        content: counter(page);
+    }
+}
+
+/* First page of each article — no running header */
+@page article-first {
+    @top-left { content: none; }
+    @top-right { content: none; }
+}
+
+/* Cover page — no margins, no folios */
+@page cover {
+    margin: 0;
+    @top-left { content: none; }
+    @top-right { content: none; }
+    @bottom-center { content: none; }
+}
+
+/* --- Base typography --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-tamil-body);
+    font-size: var(--body-size);
+    line-height: var(--body-line-height);
+    color: var(--color-body);
+    letter-spacing: var(--body-letter-spacing);
+}
+
+/* --- Article structure --- */
+article {
+    break-before: page;
+}
+
+article:first-of-type {
+    page: article-first;
+}
+
+/* --- Headings --- */
+h1 {
+    font-family: var(--font-tamil-display);
+    font-size: var(--h1-size);
+    font-weight: 900;
+    line-height: 1.15;
+    color: var(--color-primary);
+    break-after: avoid;
+    margin-bottom: 8pt;
+}
+
+h2 {
+    font-family: var(--font-tamil-display);
+    font-size: var(--h2-size);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-secondary);
+    break-after: avoid;
+    margin-bottom: 6pt;
+}
+
+h3 {
+    font-family: var(--font-tamil-body);
+    font-size: var(--h3-size);
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--color-muted);
+    break-after: avoid;
+    margin-bottom: 4pt;
+}
+
+h4 {
+    font-family: var(--font-tamil-display);
+    font-size: var(--h4-size);
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--color-accent);
+    break-after: avoid;
+    margin-top: 12pt;
+    margin-bottom: 4pt;
+}
+
+/* --- Body text --- */
+.article-body {
+    column-count: 2;
+    column-gap: 6mm;
+    text-align: justify;
+    orphans: 2;
+    widows: 2;
+    hyphens: manual;
+}
+
+.article-body p {
+    margin-bottom: 6pt;
+    text-indent: 0;
+}
+
+.article-body p + p {
+    text-indent: 1.5em;
+}
+
+/* --- Drop cap --- */
+.article-body > p:first-of-type {
+    text-indent: 0;
+}
+
+.article-body > p:first-of-type::first-letter {
+    font-family: var(--font-tamil-display);
+    font-size: 3.4em;
+    float: left;
+    line-height: 0.8;
+    margin-right: 0.06em;
+    margin-top: 0.05em;
+    color: var(--color-accent);
+    font-weight: 900;
+}
+
+/* --- Pull quote --- */
+.pull-quote {
+    column-span: all;
+    font-family: var(--font-tamil-display);
+    font-size: var(--pullquote-size);
+    line-height: var(--pullquote-line-height);
+    color: var(--color-accent);
+    border-left: 3pt solid var(--color-gold);
+    padding: 8pt 16pt;
+    margin: 14pt 0;
+    break-inside: avoid;
+    font-weight: 600;
+}
+
+/* --- Images --- */
+figure {
+    break-inside: avoid;
+    margin: 10pt 0;
+}
+
+figure img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+figcaption {
+    font-family: var(--font-tamil-body);
+    font-size: 8pt;
+    color: var(--color-caption);
+    margin-top: 4pt;
+    line-height: 1.4;
+    font-style: italic;
+}
+
+/* --- Byline --- */
+.byline {
+    font-family: var(--font-tamil-body);
+    font-size: 10pt;
+    color: var(--color-muted);
+    margin-bottom: 16pt;
+    font-weight: 500;
+}
+
+/* --- Decorative divider --- */
+.divider {
+    text-align: center;
+    margin: 16pt 0;
+    color: var(--color-gold);
+    font-size: 14pt;
+    letter-spacing: 0.3em;
+}
+
+/* --- Page break utilities --- */
+.page-break {
+    break-before: page;
+}
+
+.avoid-break {
+    break-inside: avoid;
+}

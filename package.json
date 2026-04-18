@@ -1,0 +1,26 @@
+{
+  "name": "magazine-pdf-generator",
+  "version": "1.0.0",
+  "description": "Print-quality Tamil magazine PDF generator using Paged.js",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "render-test": "node server/pdf/render-test.js"
+  },
+  "keywords": [
+    "tamil",
+    "magazine",
+    "pdf",
+    "paged.js",
+    "print"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.2.1",
+    "mammoth": "^1.12.0",
+    "multer": "^2.1.1",
+    "puppeteer": "^24.41.0",
+    "sharp": "^0.34.5"
+  }
+}

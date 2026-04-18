@@ -1,0 +1,118 @@
+/* ========================================
+   Template 4: Feature Article — Opening
+   ======================================== */
+
+.feature-opening {
+    page: article-first;
+}
+
+/* --- Hero section --- */
+.feature-hero {
+    margin-bottom: 20pt;
+    position: relative;
+}
+
+.feature-hero .category-tag {
+    font-family: var(--font-english);
+    font-size: 9pt;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--color-accent);
+    margin-bottom: 8pt;
+    display: block;
+}
+
+.feature-hero h1 {
+    font-family: var(--font-tamil-display);
+    font-size: 36pt;
+    font-weight: 900;
+    line-height: 1.1;
+    color: var(--color-primary);
+    margin-bottom: 10pt;
+}
+
+.feature-hero .subtitle {
+    font-family: var(--font-tamil-display);
+    font-size: 14pt;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--color-secondary);
+    margin-bottom: 12pt;
+}
+
+.feature-hero .byline {
+    font-family: var(--font-tamil-body);
+    font-size: 9.5pt;
+    color: var(--color-muted);
+    padding-top: 8pt;
+    border-top: 0.5pt solid var(--color-divider);
+    margin-bottom: 0;
+}
+
+.feature-hero .byline .author-name {
+    font-weight: 700;
+    color: var(--color-body);
+}
+
+/* --- Decorative accent line --- */
+.accent-line {
+    width: 40pt;
+    height: 3pt;
+    background: var(--color-accent);
+    margin-bottom: 12pt;
+    border: none;
+}
+
+/* --- Lead image --- */
+.lead-image {
+    margin: 16pt 0;
+    break-inside: avoid;
+    column-span: all;
+}
+
+.lead-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.lead-image figcaption {
+    font-size: 8pt;
+    color: var(--color-caption);
+    margin-top: 4pt;
+    padding-bottom: 8pt;
+    border-bottom: 0.5pt solid var(--color-divider);
+}
+
+/* --- Inset image (within columns) --- */
+.inset-image {
+    float: right;
+    width: 45%;
+    margin: 4pt 0 10pt 10pt;
+    break-inside: avoid;
+}
+
+.inset-image img {
+    width: 100%;
+    height: auto;
+}
+
+.inset-image figcaption {
+    font-size: 7.5pt;
+    margin-top: 3pt;
+}
+
+/* --- Article body overrides for this template --- */
+.feature-opening .article-body > p:first-of-type::first-letter {
+    font-size: 3.6em;
+    color: var(--color-accent);
+}
+
+/* --- End mark --- */
+.end-mark {
+    text-align: center;
+    margin-top: 12pt;
+    color: var(--color-gold);
+    font-size: 12pt;
+}

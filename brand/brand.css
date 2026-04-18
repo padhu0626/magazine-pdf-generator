@@ -1,0 +1,62 @@
+/* ========================================
+   Tamil Magazine — Brand Design Tokens
+   ======================================== */
+
+/* --- Colors --- */
+:root {
+    --color-primary: #1a1a2e;
+    --color-secondary: #16213e;
+    --color-accent: #c62828;
+    --color-gold: #c9a961;
+    --color-cream: #f5e9da;
+    --color-muted: #6b7280;
+    --color-body: #1a1a1a;
+    --color-caption: #4a4a4a;
+    --color-bg: #ffffff;
+    --color-divider: #d4c5b0;
+}
+
+/* --- Typography --- */
+@import url('https://fonts.googleapis.com/css2?family=Catamaran:wght@400;600;700;800;900&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+    --font-tamil-body: 'Noto Sans Tamil', 'Latha', 'Tamil MN', sans-serif;
+    --font-tamil-display: 'Catamaran', 'Noto Sans Tamil', sans-serif;
+    --font-english: 'Inter', -apple-system, sans-serif;
+    --font-ui: 'Inter', sans-serif;
+
+    /* Body text sizing */
+    --body-size: 10.5pt;
+    --body-line-height: 1.55;
+    --body-letter-spacing: 0.01em;
+
+    /* Heading sizing */
+    --h1-size: 32pt;
+    --h2-size: 18pt;
+    --h3-size: 14pt;
+    --h4-size: 12pt;
+
+    /* Pull quote */
+    --pullquote-size: 16pt;
+    --pullquote-line-height: 1.35;
+}
+
+/* --- OpenType features for Tamil --- */
+body {
+    font-feature-settings: "liga", "clig", "calt";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Mixed script font assignment --- */
+@font-face {
+    font-family: 'MagazineBody';
+    src: local('Noto Sans Tamil');
+    unicode-range: U+0B80-0BFF; /* Tamil */
+}
+
+@font-face {
+    font-family: 'MagazineBody';
+    src: local('Inter');
+    unicode-range: U+0000-007F, U+0080-00FF; /* Latin */
+}

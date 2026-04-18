@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+*.log
+.env
+issues/*/articles/
+issues/*/final.pdf
+issues/*/preview.pdf
+output/
