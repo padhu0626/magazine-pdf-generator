@@ -2,7 +2,7 @@
   "id": "2026-01",
   "title": "குறிஞ்சி",
   "magazineName": "சங்கமம்",
-  "coverImage": "/uploads/images/1776481989876-opt.jpg",
+  "coverImage": "/uploads/images/1776482403356-opt.jpg",
   "date": "April 2026",
   "tagline": "",
   "articles": [
@@ -20,13 +20,13 @@
       "images": [],
       "wordCount": 189,
       "suggestedTemplate": "feature-opening",
-      "sourceFile": "1776481997947-sample-article.docx",
+      "sourceFile": "1776482411013-sample-article.docx",
       "parseMessages": [],
       "imageCount": 0,
-      "id": "1776481997947-sample-article",
+      "id": "1776482411013-sample-article",
       "template": "feature-opening",
-      "authorPhoto": "/uploads/images/1776482000913-opt.jpg",
-      "heroImage": "/uploads/images/1776482004674-opt.jpg",
+      "authorPhoto": "/uploads/images/1776482413914-opt.jpg",
+      "heroImage": "/uploads/images/1776482417297-opt.jpg",
       "heroCaption": "",
       "galleryPhotos": []
     },
@@ -45,16 +45,16 @@
       ],
       "wordCount": 173,
       "suggestedTemplate": "feature-opening",
-      "sourceFile": "1776482022051-sample-with-image.docx",
+      "sourceFile": "1776482426025-sample-with-image.docx",
       "parseMessages": [],
       "imageCount": 1,
-      "id": "1776482022051-sample-with-image",
+      "id": "1776482426025-sample-with-image",
       "template": "feature-opening",
-      "authorPhoto": "/uploads/images/1776482027034-opt.jpg",
+      "authorPhoto": "/uploads/images/1776482428687-opt.jpg",
       "heroImage": "",
       "heroCaption": "",
       "galleryPhotos": []
     }
   ],
-  "createdAt": "2026-04-18T03:13:12.397Z"
+  "createdAt": "2026-04-18T03:20:04.622Z"
 }

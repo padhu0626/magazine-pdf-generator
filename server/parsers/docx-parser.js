@@ -47,7 +47,12 @@ async function parseDocx(docxPath, outputDir) {
                     fs.writeFileSync(imagePath, buffer);
                 }
 
-                return { src: `images/${filename}` };
+                // Use path relative to project root so the HTTP server can serve it
+                const relPath = path.relative(
+                    path.resolve(__dirname, '../..'),
+                    imagePath
+                );
+                return { src: `/${relPath}` };
             }),
         }
     );
