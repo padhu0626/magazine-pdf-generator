@@ -54,47 +54,17 @@ figure, blockquote, table { break-inside: avoid; page-break-inside: avoid; }
 img { max-width: 100%; image-rendering: auto; }
 
 /* ================================================
-   BRANDED PAGE HEADER — appears on every article page
-   Colorful pennant/bunting strip + magazine name
+   BRANDED PAGE HEADER — clean, modern
    ================================================ */
 .page-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8pt;
-    position: relative;
+    margin-bottom: 10pt;
 }
 
-/* Colorful pennant/bunting strip */
-.pennant-strip {
+.header-accent-line {
     width: 100%;
-    height: 10pt;
-    background: repeating-linear-gradient(
-        90deg,
-        #c62828 0px, #c62828 8px,
-        #ff9800 8px, #ff9800 16px,
-        #4caf50 16px, #4caf50 24px,
-        #2196f3 24px, #2196f3 32px,
-        #9c27b0 32px, #9c27b0 40px,
-        #ffeb3b 40px, #ffeb3b 48px
-    );
-    margin-bottom: 4pt;
-}
-
-/* Triangular pennant version */
-.pennant-triangles {
-    width: 100%;
-    height: 14pt;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='14' viewBox='0 0 24 14'%3E%3Cpolygon points='0,0 12,14 24,0' fill='%23c62828'/%3E%3C/svg%3E"),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='14' viewBox='0 0 24 14'%3E%3Cpolygon points='0,0 12,14 24,0' fill='%234caf50'/%3E%3C/svg%3E"),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='14' viewBox='0 0 24 14'%3E%3Cpolygon points='0,0 12,14 24,0' fill='%23ff9800'/%3E%3C/svg%3E"),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='14' viewBox='0 0 24 14'%3E%3Cpolygon points='0,0 12,14 24,0' fill='%232196f3'/%3E%3C/svg%3E"),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='14' viewBox='0 0 24 14'%3E%3Cpolygon points='0,0 12,14 24,0' fill='%239c27b0'/%3E%3C/svg%3E"),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='14' viewBox='0 0 24 14'%3E%3Cpolygon points='0,0 12,14 24,0' fill='%23ffeb3b'/%3E%3C/svg%3E");
-    background-size: 24px 14px;
-    background-position: 0 0, 24px 0, 48px 0, 72px 0, 96px 0, 120px 0;
-    background-repeat: repeat-x;
-    margin-bottom: 4pt;
+    height: 2pt;
+    background: var(--color-accent);
+    margin-bottom: 5pt;
 }
 
 .header-bar {
@@ -320,3 +290,193 @@ figcaption {
 /* Page break utility */
 .page-break { break-before: page; }
 .avoid-break { break-inside: avoid; }
+
+/* ================================================
+   AUTHOR PHOTO — small passport-size beside byline
+   ================================================ */
+.author-block {
+    display: flex;
+    align-items: center;
+    gap: 8pt;
+    margin-bottom: 14pt;
+    padding: 6pt 0;
+    border-top: 0.5pt solid var(--color-divider);
+    border-bottom: 0.5pt solid var(--color-divider);
+}
+
+.author-photo {
+    width: 40pt;
+    height: 48pt;
+    object-fit: cover;
+    border-radius: 4pt;
+    border: 1.5pt solid var(--color-gold);
+    flex-shrink: 0;
+    background: var(--color-cream);
+}
+
+.author-details {
+    font-family: var(--font-tamil-body);
+}
+
+.author-details .author-name {
+    font-size: 10pt;
+    font-weight: 700;
+    color: var(--color-body);
+}
+
+.author-details .author-role {
+    font-size: 8pt;
+    color: var(--color-muted);
+}
+
+/* ================================================
+   BANNER / HERO IMAGE — large at top of article
+   ================================================ */
+.hero-banner {
+    width: 100%;
+    margin: -12mm -14mm 14pt -14mm;
+    width: calc(100% + 28mm);
+    max-height: 180pt;
+    overflow: hidden;
+    position: relative;
+}
+
+.hero-banner img {
+    width: 100%;
+    height: 180pt;
+    object-fit: cover;
+    display: block;
+}
+
+.hero-banner .banner-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    padding: 16pt 14mm 6pt;
+    font-size: 8pt;
+    color: rgba(255,255,255,0.8);
+    font-family: var(--font-tamil-body);
+}
+
+/* ================================================
+   KIDS ART GALLERY — flexible photo grid
+   ================================================ */
+.gallery-page {
+    break-after: page;
+}
+
+.gallery-header {
+    text-align: center;
+    margin-bottom: 16pt;
+}
+
+.gallery-header h1 {
+    font-family: var(--font-tamil-display);
+    font-size: 24pt;
+    font-weight: 900;
+    color: var(--color-primary);
+    margin-bottom: 4pt;
+}
+
+.gallery-header .gallery-subtitle {
+    font-family: var(--font-tamil-body);
+    font-size: 10pt;
+    color: var(--color-muted);
+}
+
+/* Grid layouts */
+.gallery-grid {
+    display: grid;
+    gap: 10pt;
+}
+
+.gallery-grid.grid-1 {
+    grid-template-columns: 1fr;
+}
+
+.gallery-grid.grid-2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.gallery-grid.grid-4 {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
+.gallery-grid.grid-3 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.gallery-grid.grid-3 .gallery-item:first-child {
+    grid-column: 1 / -1;
+}
+
+/* Individual gallery item */
+.gallery-item {
+    break-inside: avoid;
+    border: 1pt solid var(--color-divider);
+    border-radius: 4pt;
+    overflow: hidden;
+    background: #fff;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    min-height: 80pt;
+    background: var(--color-cream);
+    object-fit: contain;
+}
+
+.gallery-item .gallery-caption {
+    padding: 6pt 8pt;
+    background: var(--color-cream);
+}
+
+.gallery-item .gallery-caption .artwork-title {
+    font-family: var(--font-tamil-display);
+    font-size: 10pt;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 2pt;
+}
+
+.gallery-item .gallery-caption .artist-name {
+    font-family: var(--font-tamil-body);
+    font-size: 9pt;
+    font-weight: 600;
+    color: var(--color-accent);
+}
+
+.gallery-item .gallery-caption .artist-info {
+    font-family: var(--font-tamil-body);
+    font-size: 7.5pt;
+    color: var(--color-muted);
+    margin-top: 1pt;
+}
+
+/* ================================================
+   ENHANCED CAPTIONS — for all images
+   ================================================ */
+figcaption {
+    font-family: var(--font-tamil-body);
+    font-size: 8pt;
+    color: var(--color-caption);
+    margin-top: 4pt;
+    line-height: 1.4;
+    padding: 4pt 6pt;
+    background: var(--color-cream);
+    border-left: 2pt solid var(--color-gold);
+    font-style: normal;
+}
+
+figcaption .caption-credit {
+    font-family: var(--font-english);
+    font-size: 7pt;
+    color: var(--color-muted);
+    margin-top: 2pt;
+    display: block;
+}

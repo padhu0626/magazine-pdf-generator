@@ -15,6 +15,7 @@ function composeIssue(issue, articles) {
     templateCssSet.add('cover');
     templateCssSet.add('toc');
     templateCssSet.add('back-cover');
+    templateCssSet.add('gallery');
 
     let allTemplateCss = '';
     for (const tmpl of templateCssSet) {
@@ -52,13 +53,15 @@ ${backCoverHtml}
 
 function buildPageHeader(pageNum, magazineName, sectionLabel, authorName) {
     return `
-    <div class="pennant-triangles"></div>
-    <div class="header-bar">
-        <div class="header-page-num">${pageNum || ''}</div>
-        <div class="header-magazine-name">${escapeHtml(magazineName)}</div>
-        <div class="header-article-info">
-            ${sectionLabel ? `<span class="section-name">${escapeHtml(sectionLabel)}</span>` : ''}
-            ${authorName ? `<br>${escapeHtml(authorName)}` : ''}
+    <div class="page-header">
+        <div class="header-accent-line"></div>
+        <div class="header-bar">
+            <div class="header-page-num">${pageNum || ''}</div>
+            <div class="header-magazine-name">${escapeHtml(magazineName)}</div>
+            <div class="header-article-info">
+                ${sectionLabel ? `<span class="section-name">${escapeHtml(sectionLabel)}</span>` : ''}
+                ${authorName ? `<br>${escapeHtml(authorName)}` : ''}
+            </div>
         </div>
     </div>`;
 }
@@ -134,6 +137,44 @@ function buildToc(issue, articles, magazineName) {
     <ul class="toc-list">${items}</ul>
     ${buildPageFooter(magazineName, issue.date, '')}
 </article>`;
+}
+
+function buildAuthorBlock(article) {
+    if (!article.author) return '';
+    if (article.authorPhoto) {
+        return `<div class="author-block">
+            <img class="author-photo" src="${escapeHtml(article.authorPhoto)}" alt="">
+            <div class="author-details">
+                <div class="author-name">${escapeHtml(article.author)}</div>
+                ${article.authorRole ? `<div class="author-role">${escapeHtml(article.authorRole)}</div>` : ''}
+            </div>
+        </div>`;
+    }
+    return `<p class="byline"><span class="author-name">${escapeHtml(article.author)}</span></p>`;
+}
+
+function buildHeroBanner(article) {
+    if (!article.heroImage) return '';
+    return `<div class="hero-banner">
+        <img src="${escapeHtml(article.heroImage)}" alt="">
+        ${article.heroCaption ? `<div class="banner-caption">${escapeHtml(article.heroCaption)}</div>` : ''}
+    </div>`;
+}
+
+function buildGalleryGrid(article) {
+    const photos = article.galleryPhotos || [];
+    if (photos.length === 0) return '';
+    const gridClass = photos.length >= 4 ? 'grid-4' : photos.length >= 3 ? 'grid-3' : photos.length === 2 ? 'grid-2' : 'grid-1';
+    const items = photos.map(p => `
+        <div class="gallery-item">
+            <img src="${escapeHtml(p.src || '')}" alt="${escapeHtml(p.title || '')}">
+            <div class="gallery-caption">
+                ${p.title ? `<div class="artwork-title">${escapeHtml(p.title)}</div>` : ''}
+                ${p.artist ? `<div class="artist-name">${escapeHtml(p.artist)}</div>` : ''}
+                ${p.info ? `<div class="artist-info">${escapeHtml(p.info)}</div>` : ''}
+            </div>
+        </div>`).join('\n');
+    return `<div class="gallery-grid ${gridClass}">${items}</div>`;
 }
 
 function buildArticleSection(article, index, issue, magazineName) {
@@ -216,17 +257,31 @@ function buildArticleSection(article, index, issue, magazineName) {
     ${footer}
 </article>`;
 
+        case 'gallery':
+            return `
+<article class="gallery-page">
+    ${header}
+    <header class="gallery-header">
+        <h1>${escapeHtml(article.title || 'மாணவர் கலைத்திறன்')}</h1>
+        ${article.subtitle ? `<p class="gallery-subtitle">${escapeHtml(article.subtitle)}</p>` : ''}
+    </header>
+    ${article.bodyHtml ? `<p class="gallery-intro">${escapeHtml(article.bodyHtml.replace(/<[^>]+>/g, '').substring(0, 200))}</p>` : ''}
+    ${buildGalleryGrid(article)}
+    ${footer}
+</article>`;
+
         default: // feature-opening, feature-continuation
             return `
 <article class="${template}">
     ${header}
+    ${buildHeroBanner(article)}
     <header class="feature-hero">
         ${article.category ? `<span class="category-tag">${escapeHtml(article.category)}</span>` : ''}
         <hr class="accent-line">
         <h1>${escapeHtml(article.title)}</h1>
         ${article.subtitle ? `<p class="subtitle">${escapeHtml(article.subtitle)}</p>` : ''}
-        ${article.author ? `<p class="byline"><span class="author-name">${escapeHtml(article.author)}</span></p>` : ''}
     </header>
+    ${buildAuthorBlock(article)}
     <div class="article-body">${bodyHtml}</div>
     <div class="end-mark">வி</div>
     ${footer}

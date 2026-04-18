@@ -1,0 +1,42 @@
+/* Template 13: Kids Art Gallery / Talent Showcase */
+.gallery-page .gallery-intro {
+    font-family: var(--font-tamil-body);
+    font-size: 10pt;
+    color: var(--color-muted);
+    text-align: center;
+    margin-bottom: 14pt;
+    font-style: italic;
+}
+
+/* Full-page single artwork */
+.gallery-grid.grid-1 .gallery-item img {
+    min-height: 200pt;
+    max-height: 400pt;
+}
+
+/* Two artworks side by side */
+.gallery-grid.grid-2 .gallery-item img {
+    min-height: 150pt;
+    max-height: 280pt;
+}
+
+/* Four artworks in 2x2 grid */
+.gallery-grid.grid-4 .gallery-item img {
+    min-height: 120pt;
+    max-height: 200pt;
+}
+
+/* Star/ribbon decoration for kids */
+.gallery-item .award-badge {
+    position: absolute;
+    top: 6pt;
+    right: 6pt;
+    background: var(--color-gold);
+    color: #fff;
+    font-size: 7pt;
+    font-weight: 700;
+    padding: 2pt 6pt;
+    border-radius: 2pt;
+    font-family: var(--font-english);
+    text-transform: uppercase;
+}
