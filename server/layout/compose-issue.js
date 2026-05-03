@@ -11,7 +11,6 @@ function composeIssue(issue, articles) {
 
     const templateCssSet = new Set(articles.map(a => a.template || 'feature-opening'));
     templateCssSet.add('cover');
-    templateCssSet.add('toc');
     templateCssSet.add('back-cover');
     templateCssSet.add('gallery');
 
@@ -25,8 +24,7 @@ function composeIssue(issue, articles) {
 
     const magazineName = issue.magazineName || issue.title || 'Magazine';
     const coverHtml = buildCover(issue, articles, magazineName);
-    const tocHtml = buildToc(issue, articles, magazineName);
-    const articlesHtml = articles.map((a, idx) => buildArticleSection(a, idx, issue, magazineName)).join('\n');
+    const articlesHtml = articles.map((a, idx) => buildArticleSection(a, idx, issue, magazineName, idx === articles.length - 1)).join('\n');
     const backCoverHtml = buildBackCover(issue, magazineName);
 
     return `<!DOCTYPE html>
@@ -42,7 +40,6 @@ ${allTemplateCss}
 </head>
 <body>
 ${coverHtml}
-${tocHtml}
 ${articlesHtml}
 ${backCoverHtml}
 </body>
@@ -78,33 +75,39 @@ function buildPageFooter(magazineName, issueDate, website) {
 }
 
 function buildCover(issue, articles, magazineName) {
-    const teasers = articles.slice(0, 3).map(a =>
-        `<p class="teaser">${escapeHtml(a.title)}</p>`
-    ).join('\n');
+    // Pick up to 2 major article titles as prominent teasers for the cover
+    const teaserArticles = articles.filter(a =>
+        a.title && a.template !== 'gallery' && a.id && !a.id.startsWith('riddle-answers')
+    );
+    const teasers = teaserArticles.slice(0, 2).map(a => {
+        // Shorten long titles with ellipsis
+        let t = a.title;
+        if (t.length > 25) t = t.substring(0, 23) + '...';
+        return `<p class="teaser">${escapeHtml(t)}</p>`;
+    }).join('\n');
 
     return `
 <div class="cover-page">
     ${issue.coverImage ? `<img class="cover-bg" src="${escapeHtml(issue.coverImage)}" alt="">` : ''}
     <div class="cover-overlay"></div>
+    <div class="cover-teasers">${teasers}</div>
     <div class="cover-content">
         <div class="cover-masthead">
             <div class="magazine-name">${escapeHtml(magazineName)}</div>
-            <div class="magazine-subtitle">TAMIL MAGAZINE</div>
             <div class="issue-info">
-                <span>${escapeHtml(issue.id || 'Issue 01')}</span>
+                <span>${escapeHtml(issue.date || 'ஏப்ரல் 2026')}</span>
                 <span class="dot"></span>
-                <span>${escapeHtml(issue.date || 'April 2026')}</span>
+                <span>இதழ் ${escapeHtml(issue.id || '01')}</span>
             </div>
             <div class="gold-line"></div>
         </div>
-        <div class="cover-theme">
-            <h1>${escapeHtml(issue.title || magazineName)}</h1>
+        ${issue.title ? `<div class="cover-theme">
+            <h1>${escapeHtml(issue.title)}</h1>
             ${issue.tagline ? `<p class="tagline">${escapeHtml(issue.tagline)}</p>` : ''}
-        </div>
-        <div class="cover-teasers">${teasers}</div>
+        </div>` : ''}
     </div>
     <div class="cover-bottom-bar">
-        <span>${escapeHtml(issue.date || 'April 2026')}</span>
+        <span>${escapeHtml(issue.date || 'ஏப்ரல் 2026')}</span>
         <span>${escapeHtml(magazineName)}</span>
     </div>
 </div>`;
@@ -118,7 +121,7 @@ function buildToc(issue, articles, magazineName) {
             <span class="toc-number">${String(idx + 1).padStart(2, '0')}</span>
             <div class="toc-details">
                 <div class="toc-title">${escapeHtml(a.title)}</div>
-                <div class="toc-meta">${escapeHtml(a.author || '')} ${a.category ? `<span class="toc-category">${escapeHtml(a.category)}</span>` : ''}</div>
+                <div class="toc-meta">${escapeHtml(a.authorDisplay || a.author || '')} ${a.category ? `<span class="toc-category">${escapeHtml(a.category)}</span>` : ''}</div>
             </div>
             <span class="toc-page-num">${pageNum}</span>
         </li>`;
@@ -139,17 +142,18 @@ function buildToc(issue, articles, magazineName) {
 }
 
 function buildAuthorBlock(article) {
-    if (!article.author) return '';
+    const displayName = article.authorDisplay || article.author;
+    if (!displayName) return '';
     if (article.authorPhoto) {
         return `<div class="author-block">
             <img class="author-photo" src="${escapeHtml(article.authorPhoto)}" alt="">
             <div class="author-details">
-                <div class="author-name">${escapeHtml(article.author)}</div>
+                <div class="author-name">${escapeHtml(displayName)}</div>
                 ${article.authorRole ? `<div class="author-role">${escapeHtml(article.authorRole)}</div>` : ''}
             </div>
         </div>`;
     }
-    return `<p class="byline"><span class="author-name">${escapeHtml(article.author)}</span></p>`;
+    return `<p class="byline"><span class="author-name">${escapeHtml(displayName)}</span></p>`;
 }
 
 function buildHeroBanner(article) {
@@ -169,17 +173,36 @@ function buildGalleryGrid(article) {
             <img src="${escapeHtml(p.src || '')}" alt="${escapeHtml(p.title || '')}">
             <div class="gallery-caption">
                 ${p.title ? `<div class="artwork-title">${escapeHtml(p.title)}</div>` : ''}
-                ${p.artist ? `<div class="artist-name">${escapeHtml(p.artist)}</div>` : ''}
-                ${p.info ? `<div class="artist-info">${escapeHtml(p.info)}</div>` : ''}
+                ${p.artist ? `<div class="artist-name">${escapeHtml(p.artist)}${p.info ? ', ' + escapeHtml(p.info) : ''}</div>` : ''}
             </div>
         </div>`).join('\n');
     return `<div class="gallery-grid ${gridClass}">${items}</div>`;
 }
 
-function buildArticleSection(article, index, issue, magazineName) {
+function injectRiddleCardIntoBody(bodyHtml, cardHtml) {
+    if (!cardHtml) return bodyHtml;
+    if (!bodyHtml) return cardHtml;
+    // Find positions just after each </p>, then pick a random one in the middle 30-70%
+    const closings = [];
+    const re = /<\/p>/gi;
+    let m;
+    while ((m = re.exec(bodyHtml)) !== null) {
+        closings.push(m.index + m[0].length);
+    }
+    if (closings.length < 4) return bodyHtml + cardHtml;
+    const minIdx = Math.max(1, Math.floor(closings.length * 0.3));
+    const maxIdx = Math.min(closings.length - 2, Math.floor(closings.length * 0.7));
+    const range = Math.max(1, maxIdx - minIdx + 1);
+    const idx = minIdx + Math.floor(Math.random() * range);
+    const insertAt = closings[idx];
+    return bodyHtml.slice(0, insertAt) + cardHtml + bodyHtml.slice(insertAt);
+}
+
+function buildArticleSection(article, index, issue, magazineName, isLast) {
     const template = article.template || 'feature-opening';
     let bodyHtml = article.bodyHtml || '';
-    const pageNum = index + 3;
+    const pageNum = index + 2;
+    const endMark = isLast ? '<span class="end-mark"></span>' : '';
 
     // Insert pull quote
     if (article.pullQuotes && article.pullQuotes.length > 0 && !bodyHtml.includes('pull-quote')) {
@@ -188,8 +211,15 @@ function buildArticleSection(article, index, issue, magazineName) {
         if (paras.length > 2) { paras.splice(2, 0, pq); bodyHtml = paras.join('</p>'); }
     }
 
-    const header = buildPageHeader(pageNum, magazineName, article.category || '', article.author || '');
+    // Inject riddle card mid-body (text articles only — gallery handles its own)
+    if (article._riddleCard && template !== 'gallery') {
+        bodyHtml = injectRiddleCardIntoBody(bodyHtml, article._riddleCard);
+    }
+
+    const authorLabel = article.authorDisplay || article.author || '';
+    const header = buildPageHeader(pageNum, magazineName, article.category || '', authorLabel);
     const footer = buildPageFooter(magazineName, issue.date, '');
+    const riddleCard = (template === 'gallery') ? (article._riddleCard || '') : '';
 
     switch (template) {
         case 'editors-letter':
@@ -222,11 +252,11 @@ function buildArticleSection(article, index, issue, magazineName) {
 <article class="short-story">
     ${header}
     <header class="story-header">
-        <span class="genre-tag">Fiction &middot; சிறுகதை</span>
+        <span class="genre-tag">சிறுகதை</span>
         <h1>${escapeHtml(article.title)}</h1>
-        ${article.author ? `<p class="byline">${escapeHtml(article.author)}</p>` : ''}
+        ${authorLabel ? `<p class="byline">${escapeHtml(authorLabel)}</p>` : ''}
     </header>
-    <div class="story-body">${bodyHtml} <span class="end-mark"></span></div>
+    <div class="story-body">${bodyHtml} ${endMark}</div>
     ${footer}
 </article>`;
 
@@ -235,11 +265,11 @@ function buildArticleSection(article, index, issue, magazineName) {
 <article class="poetry-page">
     ${header}
     <header class="poetry-header">
-        <span class="genre-tag">Poetry &middot; கவிதை</span>
+        <span class="genre-tag">கவிதை</span>
         <h1>${escapeHtml(article.title)}</h1>
     </header>
     <div class="poem"><div class="poem-body">${bodyHtml}</div>
-    ${article.author ? `<div class="poet-credit">— ${escapeHtml(article.author)}</div>` : ''}</div>
+    ${authorLabel ? `<div class="poet-credit">— ${escapeHtml(authorLabel)}</div>` : ''}</div>
     ${footer}
 </article>`;
 
@@ -260,16 +290,16 @@ function buildArticleSection(article, index, issue, magazineName) {
             return `
 <article class="gallery-page">
     ${header}
-    <header class="gallery-header">
-        <h1>${escapeHtml(article.title || 'மாணவர் கலைத்திறன்')}</h1>
-        ${article.subtitle ? `<p class="gallery-subtitle">${escapeHtml(article.subtitle)}</p>` : ''}
-    </header>
-    ${article.bodyHtml ? `<p class="gallery-intro">${escapeHtml(article.bodyHtml.replace(/<[^>]+>/g, '').substring(0, 200))}</p>` : ''}
     ${buildGalleryGrid(article)}
+    ${riddleCard}
     ${footer}
 </article>`;
 
         default: // feature-opening, feature-continuation
+            // If this is a riddle-only snippet (no title), just render the card
+            if (article._isRiddleOnly) {
+                return `<div>${bodyHtml || riddleCard}</div>`;
+            }
             return `
 <article class="${template}">
     ${header}
@@ -281,28 +311,38 @@ function buildArticleSection(article, index, issue, magazineName) {
         ${article.subtitle ? `<p class="subtitle">${escapeHtml(article.subtitle)}</p>` : ''}
     </header>
     ${buildAuthorBlock(article)}
-    <div class="article-body">${bodyHtml} <span class="end-mark"></span></div>
+    <div class="article-body">${bodyHtml} ${endMark}</div>
+    ${riddleCard}
     ${footer}
 </article>`;
     }
 }
 
 function buildBackCover(issue, magazineName) {
+    if (issue.backCoverImage) {
+        return `
+<div class="back-cover">
+    <img class="cover-bg" src="${escapeHtml(issue.backCoverImage)}" alt="">
+    <div class="cover-overlay" style="opacity:0.3"></div>
+    <div class="back-bottom" style="position:relative;z-index:2">
+        <div class="issue-id">${escapeHtml(issue.id || '')} &middot; ${escapeHtml(issue.date || '')}</div>
+        <div class="credits">${escapeHtml(magazineName)}</div>
+    </div>
+</div>`;
+    }
     return `
 <div class="back-cover">
     <div class="back-top">
         <div class="back-magazine-name">${escapeHtml(magazineName)}</div>
-        <div class="back-tagline">TAMIL MAGAZINE</div>
         <div class="back-gold-line"></div>
         <div class="next-issue">
-            <p class="label">Coming Next</p>
-            <h2>அடுத்த இதழில்</h2>
-            <p class="teaser">மேலும் சிறந்த கட்டுரைகள் வரவிருக்கின்றன</p>
+            <h2>\u0B85\u0B9F\u0BC1\u0BA4\u0BCD\u0BA4 \u0B87\u0BA4\u0BB4\u0BBF\u0BB2\u0BCD</h2>
+            <p class="teaser">\u0BAE\u0BC7\u0BB2\u0BC1\u0BAE\u0BCD \u0B9A\u0BBF\u0BB1\u0BA8\u0BCD\u0BA4 \u0B95\u0B9F\u0BCD\u0B9F\u0BC1\u0BB0\u0BC8\u0B95\u0BB3\u0BCD \u0BB5\u0BB0\u0BB5\u0BBF\u0BB0\u0BC1\u0B95\u0BCD\u0B95\u0BBF\u0BA9\u0BCD\u0BB1\u0BA9</p>
         </div>
     </div>
     <div class="back-bottom">
         <div class="issue-id">${escapeHtml(issue.id || '')} &middot; ${escapeHtml(issue.date || '')}</div>
-        <div class="credits">Published by ${escapeHtml(magazineName)}</div>
+        <div class="credits">${escapeHtml(magazineName)}</div>
     </div>
 </div>`;
 }

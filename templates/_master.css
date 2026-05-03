@@ -6,7 +6,7 @@
 /* --- Page dimensions --- */
 @page {
     size: A4;
-    margin: 12mm 14mm 18mm 14mm;
+    margin: 10mm 12mm 12mm 12mm;
 
     @top-left { content: none; }
     @top-right { content: none; }
@@ -16,13 +16,13 @@
 }
 
 @page :left {
-    margin-left: 16mm;
-    margin-right: 14mm;
+    margin-left: 14mm;
+    margin-right: 12mm;
 }
 
 @page :right {
-    margin-left: 14mm;
-    margin-right: 16mm;
+    margin-left: 12mm;
+    margin-right: 14mm;
 }
 
 @page cover {
@@ -54,24 +54,35 @@ figure, blockquote, table { break-inside: avoid; page-break-inside: avoid; }
 img { max-width: 100%; image-rendering: auto; }
 
 /* ================================================
-   BRANDED PAGE HEADER — clean, modern
+   BRANDED PAGE HEADER — refined, editorial
    ================================================ */
 .page-header {
-    margin-bottom: 10pt;
+    margin-bottom: 8pt;
 }
 
 .header-accent-line {
     width: 100%;
-    height: 2pt;
+    height: 0.75pt;
+    background: var(--color-divider);
+    margin-bottom: 4pt;
+    position: relative;
+}
+
+.header-accent-line::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 28pt;
+    height: 0.75pt;
     background: var(--color-accent);
-    margin-bottom: 5pt;
 }
 
 .header-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 2pt 0;
+    padding: 1pt 0;
 }
 
 .header-page-num {
@@ -86,25 +97,30 @@ img { max-width: 100%; image-rendering: auto; }
     align-items: center;
     justify-content: center;
     border-radius: 2pt;
+    letter-spacing: 0;
 }
 
 .header-magazine-name {
     font-family: var(--font-tamil-display);
-    font-size: 18pt;
-    font-weight: 900;
-    color: var(--color-accent);
+    font-size: 11pt;
+    font-weight: 700;
+    color: var(--color-primary);
+    letter-spacing: 0.03em;
 }
 
 .header-article-info {
-    font-family: var(--font-tamil-body);
-    font-size: 8pt;
+    font-family: var(--font-english);
+    font-size: 7.5pt;
     color: var(--color-muted);
     text-align: right;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 .header-article-info .section-name {
     font-weight: 700;
     color: var(--color-accent);
+    letter-spacing: 0.1em;
 }
 
 /* ================================================
@@ -113,38 +129,42 @@ img { max-width: 100%; image-rendering: auto; }
 .page-footer {
     position: relative;
     margin-top: auto;
-    padding-top: 8pt;
-    border-top: 0.5pt solid var(--color-divider);
+    padding-top: 6pt;
+    border-top: 0.4pt solid var(--color-divider);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 8pt;
+    font-size: 7.5pt;
     color: var(--color-muted);
+    letter-spacing: 0.05em;
 }
 
 .page-footer .footer-left {
     font-family: var(--font-english);
+    text-transform: uppercase;
 }
 
 .page-footer .footer-center {
     display: flex;
     align-items: center;
-    gap: 4pt;
+    gap: 6pt;
     font-family: var(--font-tamil-display);
-    font-weight: 700;
-    font-size: 9pt;
+    font-weight: 600;
+    font-size: 8.5pt;
     color: var(--color-body);
+    letter-spacing: 0.04em;
 }
 
 .page-footer .footer-dot {
-    width: 4pt;
-    height: 4pt;
-    background: var(--color-accent);
+    width: 3pt;
+    height: 3pt;
+    background: var(--color-gold);
     border-radius: 50%;
 }
 
 .page-footer .footer-right {
     font-family: var(--font-english);
+    text-transform: uppercase;
 }
 
 /* ================================================
@@ -214,29 +234,51 @@ h4 {
 .article-body > p:first-of-type { text-indent: 0; }
 .article-body > p:first-of-type::first-letter {
     font-family: var(--font-tamil-display);
-    font-size: 3.4em;
+    font-size: 4.2em;
     float: left;
-    line-height: 0.8;
-    margin-right: 0.06em;
-    margin-top: 0.05em;
+    line-height: 0.85;
+    margin-right: 0.08em;
+    margin-top: 0.04em;
+    margin-bottom: -0.05em;
     color: var(--color-accent);
     font-weight: 900;
-    background: var(--color-cream);
-    padding: 2pt 4pt;
+    padding: 0;
+    background: transparent;
+    text-shadow: none;
 }
 
-/* Pull quote */
+/* Pull quote — centered with decorative quotation marks */
 .pull-quote {
     column-span: all;
     font-family: var(--font-tamil-display);
     font-size: var(--pullquote-size);
     line-height: var(--pullquote-line-height);
-    color: var(--color-accent);
-    border-left: 3pt solid var(--color-gold);
-    padding: 8pt 16pt;
-    margin: 14pt 0;
+    color: var(--color-primary);
+    border: none;
+    border-top: 0.5pt solid var(--color-gold);
+    border-bottom: 0.5pt solid var(--color-gold);
+    padding: 8pt 20pt;
+    margin: 10pt 8pt;
     break-inside: avoid;
-    font-weight: 600;
+    font-weight: 700;
+    text-align: center;
+    font-style: normal;
+    position: relative;
+}
+
+.pull-quote::before {
+    content: "\201C";
+    position: absolute;
+    top: -2pt;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    padding: 0 8pt;
+    font-family: var(--font-english);
+    font-size: 18pt;
+    color: var(--color-gold);
+    line-height: 1;
+    font-weight: 700;
 }
 
 /* Images */
@@ -254,29 +296,209 @@ figcaption {
 /* Byline */
 .byline {
     font-family: var(--font-tamil-body);
-    font-size: 10pt;
+    font-size: 9.5pt;
     color: var(--color-muted);
     margin-bottom: 16pt;
     font-weight: 500;
+    letter-spacing: 0.02em;
 }
 
-/* Divider */
+.byline .author-name {
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+/* Decorative ornament divider */
 .divider {
     text-align: center;
-    margin: 16pt 0;
+    margin: 18pt 0;
     color: var(--color-gold);
-    font-size: 14pt;
-    letter-spacing: 0.3em;
+    font-size: 12pt;
+    letter-spacing: 0.4em;
 }
 
-/* End mark — small square at end of article */
+.divider::before {
+    content: "\2767";
+    color: var(--color-gold);
+    font-size: 14pt;
+}
+
+/* End mark — small red square at end of magazine */
 .end-mark {
+    display: inline-block !important;
+    width: 8pt !important;
+    height: 8pt !important;
+    background: var(--color-accent) !important;
+    margin-left: 4pt !important;
+    vertical-align: middle !important;
+    color: transparent !important;
+    font-size: 0 !important;
+}
+
+/* Riddle snippet cards — playful kid-friendly cards mid-article */
+.riddle-card {
+    break-inside: avoid;
+    border-radius: 12pt;
+    padding: 10pt 16pt 8pt;
+    margin: 8pt auto;
+    position: relative;
+    width: 75%;
+    max-width: 340pt;
+    box-shadow: 0 2pt 6pt rgba(0,0,0,0.08);
+    column-span: all;
+    overflow: visible;
+}
+
+/* Each card: soft pastel body, accent ribbon top, colored solid border */
+.riddle-card-1 { background: #fff8e6; border: 1.5pt solid #f57c00; }
+.riddle-card-1 .riddle-card-title { background: #f57c00; }
+.riddle-card-2 { background: #f0fbe9; border: 1.5pt solid #43a047; }
+.riddle-card-2 .riddle-card-title { background: #43a047; }
+.riddle-card-3 { background: #e6f6fe; border: 1.5pt solid #0288d1; }
+.riddle-card-3 .riddle-card-title { background: #0288d1; }
+.riddle-card-4 { background: #fdeaf0; border: 1.5pt solid #d81b60; }
+.riddle-card-4 .riddle-card-title { background: #d81b60; }
+.riddle-card-5 { background: #f5ecfa; border: 1.5pt solid #8e24aa; }
+.riddle-card-5 .riddle-card-title { background: #8e24aa; }
+
+/* Decorative scattered emoji at corners — top-right mascot pops out */
+.riddle-deco-tl,
+.riddle-deco-tr,
+.riddle-deco-bl,
+.riddle-deco-br {
+    position: absolute;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.riddle-deco-tl { top: 8pt; left: 10pt; font-size: 11pt; opacity: 0.7; }
+.riddle-deco-tr {
+    top: -14pt;
+    right: -6pt;
+    font-size: 34pt;
+    transform: rotate(8deg);
+    filter: drop-shadow(0 1pt 2pt rgba(0,0,0,0.2));
+}
+.riddle-deco-bl { bottom: 8pt; left: 10pt; font-size: 10pt; opacity: 0.6; }
+.riddle-deco-br { bottom: 8pt; right: 14pt; font-size: 10pt; opacity: 0.7; }
+
+.riddle-card-header {
+    text-align: left;
+    margin: 0 38pt 10pt 0;
+    padding-bottom: 8pt;
+    border-bottom: 0.5pt solid rgba(0,0,0,0.12);
+}
+
+/* Title looks like a colored ribbon/tag */
+.riddle-card-title {
+    font-family: var(--font-tamil-display);
+    font-size: 13pt;
+    font-weight: 800;
+    color: #fff;
     display: inline-block;
-    width: 8pt;
-    height: 8pt;
-    background: var(--color-accent);
-    margin-left: 4pt;
-    vertical-align: middle;
+    padding: 3pt 12pt 4pt;
+    border-radius: 0 8pt 8pt 0;
+    margin-left: -22pt;
+    letter-spacing: 0.03em;
+    box-shadow: 0 1pt 2pt rgba(0,0,0,0.15);
+}
+
+.riddle-card-author {
+    font-family: var(--font-tamil-body);
+    font-size: 7.5pt;
+    color: var(--color-muted);
+    display: inline-block;
+    margin-left: 8pt;
+    font-style: italic;
+}
+
+.riddle-card-question {
+    font-family: var(--font-tamil-body);
+    font-size: 10pt;
+    line-height: 1.55;
+    color: var(--color-body);
+    margin-bottom: 10pt;
+    padding-left: 24pt;
+    position: relative;
+    min-height: 18pt;
+}
+
+.riddle-card-question .riddle-q-num {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18pt;
+    height: 18pt;
+    background: rgba(0,0,0,0.08);
+    color: var(--color-accent);
+    font-family: var(--font-english);
+    font-weight: 900;
+    font-size: 10pt;
+    text-align: center;
+    line-height: 18pt;
+    border-radius: 4pt;
+}
+
+.riddle-card-question .riddle-q-text {
+    display: inline;
+}
+
+.riddle-card-prompt {
+    font-family: var(--font-tamil-display);
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: var(--color-accent);
+    background: rgba(255,255,255,0.7);
+    padding: 3pt 12pt;
+    border-radius: 12pt;
+    display: block;
+    width: fit-content;
+    margin: 6pt auto 2pt;
+    box-shadow: 0 1pt 2pt rgba(0,0,0,0.08);
+    letter-spacing: 0.04em;
+    text-align: center;
+}
+
+.riddle-card-footer {
+    text-align: center;
+    font-family: var(--font-tamil-body);
+    font-size: 7pt;
+    color: var(--color-muted);
+    font-style: italic;
+    margin-top: 4pt;
+    padding-top: 4pt;
+    letter-spacing: 0.05em;
+}
+
+/* Riddle answers — compact */
+.answers-list {
+    font-size: 9pt;
+    line-height: 1.6;
+}
+
+.answer-item {
+    white-space: nowrap;
+}
+
+/* Inline poem within article */
+.inline-poem {
+    font-family: var(--font-tamil-display);
+    font-size: 11pt;
+    font-weight: 700;
+    color: var(--color-accent);
+    font-style: italic;
+    padding: 8pt 16pt;
+    margin: 8pt 0;
+    border-left: 3pt solid var(--color-gold);
+    background: var(--color-cream);
+    line-height: 1.6;
+    break-inside: avoid;
+    column-span: all;
+}
+
+.inline-poem p {
+    text-indent: 0 !important;
+    margin-bottom: 2pt;
 }
 
 /* Page break utility */
@@ -290,18 +512,18 @@ figcaption {
     display: flex;
     align-items: center;
     gap: 8pt;
-    margin-bottom: 14pt;
-    padding: 6pt 0;
-    border-top: 0.5pt solid var(--color-divider);
-    border-bottom: 0.5pt solid var(--color-divider);
+    margin-bottom: 10pt;
+    padding: 5pt 0;
+    border-top: 0.4pt solid var(--color-divider);
+    border-bottom: 0.4pt solid var(--color-divider);
 }
 
 .author-photo {
-    width: 40pt;
-    height: 48pt;
+    width: 38pt;
+    height: 38pt;
     object-fit: cover;
-    border-radius: 4pt;
-    border: 1.5pt solid var(--color-gold);
+    border-radius: 50%;
+    border: 1pt solid var(--color-gold);
     flex-shrink: 0;
     background: var(--color-cream);
 }
@@ -356,32 +578,48 @@ figcaption {
    KIDS ART GALLERY — flexible photo grid
    ================================================ */
 .gallery-page {
-    break-after: page;
+    break-after: auto;
+}
+
+.gallery-page .page-header {
+    margin-bottom: 4pt;
+}
+
+.gallery-page .page-footer {
+    margin-top: 4pt;
+    padding-top: 4pt;
 }
 
 .gallery-header {
     text-align: center;
-    margin-bottom: 16pt;
+    margin-bottom: 6pt;
+    padding-bottom: 4pt;
+    border-bottom: 0.4pt solid var(--color-divider);
+    position: relative;
 }
 
 .gallery-header h1 {
     font-family: var(--font-tamil-display);
-    font-size: 24pt;
+    font-size: 16pt;
     font-weight: 900;
     color: var(--color-primary);
-    margin-bottom: 4pt;
+    margin-bottom: 2pt;
+    letter-spacing: 0.02em;
 }
 
 .gallery-header .gallery-subtitle {
-    font-family: var(--font-tamil-body);
-    font-size: 10pt;
+    font-family: var(--font-english);
+    font-size: 8pt;
     color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
 }
 
 /* Grid layouts */
 .gallery-grid {
     display: grid;
-    gap: 10pt;
+    gap: 8pt;
+    margin: 2pt 0;
 }
 
 .gallery-grid.grid-1 {
@@ -405,27 +643,40 @@ figcaption {
     grid-column: 1 / -1;
 }
 
-/* Individual gallery item */
+/* Individual gallery item — polaroid card */
 .gallery-item {
     break-inside: avoid;
-    border: 1pt solid var(--color-divider);
-    border-radius: 4pt;
+    border: none;
+    border-radius: 0;
     overflow: hidden;
     background: #fff;
+    padding: 4pt 4pt 0;
+    box-shadow: 0 1pt 3pt rgba(0,0,0,0.07), 0 0 0 0.4pt var(--color-divider);
+    position: relative;
 }
 
 .gallery-item img {
     width: 100%;
     height: auto;
     display: block;
-    min-height: 80pt;
+    min-height: 150pt;
+    max-height: 400pt;
     background: var(--color-cream);
     object-fit: contain;
+    border-radius: 0;
+}
+
+/* When only 2 items in grid, make them bigger */
+.gallery-grid.grid-2 .gallery-item img {
+    min-height: 200pt;
+    max-height: 450pt;
 }
 
 .gallery-item .gallery-caption {
-    padding: 6pt 8pt;
-    background: var(--color-cream);
+    padding: 4pt 4pt 5pt;
+    background: #fff;
+    text-align: center;
+    border-top: none;
 }
 
 .gallery-item .gallery-caption .artwork-title {
@@ -433,21 +684,38 @@ figcaption {
     font-size: 10pt;
     font-weight: 700;
     color: var(--color-primary);
-    margin-bottom: 2pt;
+    margin-bottom: 3pt;
+    letter-spacing: 0.01em;
 }
 
 .gallery-item .gallery-caption .artist-name {
     font-family: var(--font-tamil-body);
-    font-size: 9pt;
+    font-size: 8.5pt;
     font-weight: 600;
     color: var(--color-accent);
+    letter-spacing: 0.02em;
 }
 
 .gallery-item .gallery-caption .artist-info {
-    font-family: var(--font-tamil-body);
-    font-size: 7.5pt;
+    font-family: var(--font-english);
+    font-size: 7pt;
     color: var(--color-muted);
-    margin-top: 1pt;
+    margin-top: 2pt;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* Decorative gold corner mark on each artwork */
+.gallery-item::after {
+    content: "";
+    position: absolute;
+    top: 6pt;
+    right: 6pt;
+    width: 8pt;
+    height: 8pt;
+    border-top: 1pt solid var(--color-gold);
+    border-right: 1pt solid var(--color-gold);
+    pointer-events: none;
 }
 
 /* ================================================
