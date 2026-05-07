@@ -79,9 +79,9 @@ img { max-width: 100%; image-rendering: auto; }
 }
 
 .header-bar {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
     align-items: center;
-    justify-content: space-between;
     padding: 1pt 0;
 }
 
@@ -98,6 +98,7 @@ img { max-width: 100%; image-rendering: auto; }
     justify-content: center;
     border-radius: 2pt;
     letter-spacing: 0;
+    justify-self: start;
 }
 
 .header-magazine-name {
@@ -106,6 +107,8 @@ img { max-width: 100%; image-rendering: auto; }
     font-weight: 700;
     color: var(--color-primary);
     letter-spacing: 0.03em;
+    justify-self: center;
+    text-align: center;
 }
 
 .header-article-info {
@@ -115,6 +118,7 @@ img { max-width: 100%; image-rendering: auto; }
     text-align: right;
     letter-spacing: 0.06em;
     text-transform: uppercase;
+    justify-self: end;
 }
 
 .header-article-info .section-name {
@@ -298,7 +302,7 @@ figcaption {
     font-family: var(--font-tamil-body);
     font-size: 9.5pt;
     color: var(--color-muted);
-    margin-bottom: 16pt;
+    margin-bottom: 8pt;
     font-weight: 500;
     letter-spacing: 0.02em;
 }
@@ -494,11 +498,16 @@ figcaption {
     line-height: 1.6;
     break-inside: avoid;
     column-span: all;
+    text-align: center;
+    word-spacing: normal;
 }
 
 .inline-poem p {
     text-indent: 0 !important;
+    text-align: center;
+    text-align-last: center;
     margin-bottom: 2pt;
+    word-spacing: normal;
 }
 
 /* Page break utility */
@@ -590,6 +599,13 @@ figcaption {
     padding-top: 4pt;
 }
 
+/* Make the grid fill most of the page area without overflowing the footer.
+   Keep ~30mm cushion for header + footer + paged.js metrics. */
+.gallery-page .gallery-grid {
+    min-height: 218mm;
+    max-height: 238mm;
+}
+
 .gallery-header {
     text-align: center;
     margin-bottom: 6pt;
@@ -633,14 +649,18 @@ figcaption {
 .gallery-grid.grid-4 {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
+    gap: 4pt;
 }
 
 .gallery-grid.grid-3 {
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: 130mm 100mm;
+    gap: 6pt;
 }
 
 .gallery-grid.grid-3 .gallery-item:first-child {
     grid-column: 1 / -1;
+    grid-row: 1;
 }
 
 /* Individual gallery item — polaroid card */
@@ -650,33 +670,33 @@ figcaption {
     border-radius: 0;
     overflow: hidden;
     background: #fff;
-    padding: 4pt 4pt 0;
+    padding: 3pt 3pt 0;
     box-shadow: 0 1pt 3pt rgba(0,0,0,0.07), 0 0 0 0.4pt var(--color-divider);
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .gallery-item img {
     width: 100%;
     height: auto;
     display: block;
-    min-height: 150pt;
-    max-height: 400pt;
-    background: var(--color-cream);
+    background-color: #fdfcf8;
+    background-image: radial-gradient(circle, rgba(170, 150, 120, 0.32) 0.55pt, transparent 0.6pt);
+    background-size: 7pt 7pt;
+    background-position: 0 0;
     object-fit: contain;
     border-radius: 0;
-}
-
-/* When only 2 items in grid, make them bigger */
-.gallery-grid.grid-2 .gallery-item img {
-    min-height: 200pt;
-    max-height: 450pt;
+    flex: 1;
+    min-height: 0;
 }
 
 .gallery-item .gallery-caption {
-    padding: 4pt 4pt 5pt;
+    padding: 3pt 4pt 4pt;
     background: #fff;
     text-align: center;
     border-top: none;
+    flex-shrink: 0;
 }
 
 .gallery-item .gallery-caption .artwork-title {

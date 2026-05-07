@@ -23,14 +23,14 @@
 }
 
 .back-cover .back-magazine-name {
-    font-family: var(--font-tamil-display);
-    font-size: 36pt;
+    font-family: var(--font-masthead);
+    font-size: 40pt;
     font-weight: 900;
     margin-bottom: 8pt;
     text-align: center;
-    letter-spacing: 0.01em;
+    letter-spacing: 0;
     text-shadow: 0 2px 8px rgba(0,0,0,0.4);
-    line-height: 1.1;
+    line-height: 1.05;
 }
 
 .back-cover .back-tagline {

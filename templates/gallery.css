@@ -8,22 +8,23 @@
     font-style: italic;
 }
 
-/* Full-page single artwork */
-.gallery-grid.grid-1 .gallery-item img {
-    min-height: 200pt;
-    max-height: 400pt;
+/* Per-grid track sizing: rows fill page height. Items use flex-fill via _master.css. */
+
+/* 1 artwork: full page */
+.gallery-grid.grid-1 {
+    grid-template-rows: 1fr;
 }
 
-/* Two artworks side by side */
-.gallery-grid.grid-2 .gallery-item img {
-    min-height: 150pt;
-    max-height: 280pt;
+/* 2 artworks: side-by-side, both fill page height */
+.gallery-grid.grid-2 {
+    grid-template-rows: 1fr;
 }
 
-/* Four artworks in 2x2 grid */
-.gallery-grid.grid-4 .gallery-item img {
-    min-height: 120pt;
-    max-height: 200pt;
+/* 3 artworks: grid-template-areas defined in _master.css (hero + 2 below) */
+
+/* 4 artworks: 2x2, each fills a quarter of the page */
+.gallery-grid.grid-4 {
+    grid-template-rows: 1fr 1fr;
 }
 
 /* Star/ribbon decoration for kids */

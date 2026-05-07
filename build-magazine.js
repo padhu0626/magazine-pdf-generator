@@ -33,11 +33,17 @@ const KNOWN_TYPES = ['art', 'article', 'essay', 'poem', 'story', 'riddles', 'com
 function parseFilename(filename) {
     const base = path.basename(filename, path.extname(filename));
     const parts = base.split(/\s*-\s*/).map(s => s.trim()).filter(Boolean);
-    const result = { type: '', number: '', title: '', name: '', nilai: '', raw: base };
+    const result = { type: '', number: '', title: '', name: '', nilai: '', rotate: 0, raw: base };
     if (parts.length === 0) return result;
 
     const nilaiIdx = parts.findIndex(p => /^நிலை/i.test(p) || /^nilai/i.test(p));
     if (nilaiIdx >= 0) { result.nilai = parts[nilaiIdx]; parts.splice(nilaiIdx, 1); }
+
+    const rotateIdx = parts.findIndex(p => /^rotate(90|180|270)$/i.test(p));
+    if (rotateIdx >= 0) {
+        result.rotate = parseInt(parts[rotateIdx].match(/\d+/)[0]);
+        parts.splice(rotateIdx, 1);
+    }
 
     const firstLower = parts[0].toLowerCase();
     const hasType = KNOWN_TYPES.some(t => firstLower === t || firstLower.startsWith(t));
@@ -59,11 +65,13 @@ function parseFilename(filename) {
 
 // --- Image optimization ---
 
-async function optimizeImage(srcPath, destName) {
+async function optimizeImage(srcPath, destName, rotate = 0) {
     const safeName = destName.replace(/[^a-zA-Z0-9_\u0B80-\u0BFF-]/g, '_').substring(0, 80) + '-opt.jpg';
     const destPath = path.join(IMAGES_DIR, safeName);
     try {
-        await sharp(srcPath)
+        let pipeline = sharp(srcPath);
+        if (rotate) pipeline = pipeline.rotate(rotate);
+        await pipeline
             .resize({ width: 1200, height: 1600, fit: 'inside', withoutEnlargement: true })
             .jpeg({ quality: 88 })
             .toFile(destPath);
@@ -238,6 +246,33 @@ async function buildArticle(fileInfo, index) {
         article.authorDisplay = `${fileInfo.name}, ${fileInfo.nilai}`;
     } else {
         article.authorDisplay = fileInfo.name || article.author;
+    }
+
+    // Strip duplicate title (and any author byline that follows) from the start of the body —
+    // most .docx files repeat the title/author at the top, which gets rendered twice otherwise.
+    if (article.bodyHtml) {
+        const stripTags = (html) => html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+        const titleText = stripTags(article.title || '');
+        const authorText = stripTags(article.authorDisplay || article.author || '');
+
+        for (let pass = 0; pass < 3; pass++) {
+            const m = article.bodyHtml.match(/^\s*<(p|h[1-6])[^>]*>([\s\S]*?)<\/\1>/i);
+            if (!m) break;
+            const firstHtml = m[2];
+            const firstText = stripTags(firstHtml);
+            const isShort = firstText.length > 0 && firstText.length < 120;
+            // Heuristic: first short paragraph wrapped entirely in <strong> reads as a heading
+            const allBold = /^\s*<strong[^>]*>[\s\S]*<\/strong>\s*$/i.test(firstHtml.trim());
+            const matchesTitle = titleText && firstText === titleText;
+            const matchesAuthor = authorText && isShort &&
+                (firstText === authorText || firstText.includes(authorText));
+            const looksLikeTitle = isShort && allBold;
+            if (matchesTitle || matchesAuthor || looksLikeTitle) {
+                article.bodyHtml = article.bodyHtml.slice(m[0].length).replace(/^\s+/, '');
+            } else {
+                break;
+            }
+        }
     }
 
     const typeLower = (fileInfo.type || '').toLowerCase();
@@ -474,7 +509,7 @@ async function main() {
             const key = `${label}|${img.number}`;
             if (seenArt.has(key)) continue;
             seenArt.add(key);
-            const src = await optimizeImage(img.path, `art-${label.replace(/\s+/g, '_')}-${img.number || artItems.length}`);
+            const src = await optimizeImage(img.path, `art-${label.replace(/\s+/g, '_')}-${img.number || artItems.length}`, img.rotate || 0);
             const isFullPage = (img.title || '').toLowerCase() === 'full';
             artItems.push({ src, title: isFullPage ? '' : (img.title || ''), artist: img.name || '', info: img.nilai || '', fullPage: isFullPage });
             console.log(`  OK: ${img.name}`);
@@ -503,113 +538,113 @@ async function main() {
     }
 
     // ============================================================
-    // INTERLEAVE LAYOUT
-    // Order: first article -> riddles (page 2-3) -> article + art + article + art ...
-    // Riddle answers and comic at the very end before back cover.
-    // "தமிழ் தொன்மையும் பன்மையும்" (Sangeetha) goes first.
+    // EXPLICIT ORDER -- defined by Padhu in magazine-order.md
     // ============================================================
-    console.log('\n-- Interleaving magazine layout --');
+    console.log('\n-- Assembling magazine in explicit order --');
 
-    // Sort teacher articles: Sangeetha's article first
-    parsedTeacher.sort((a, b) => {
-        const aIsSangeetha = a.title.includes('\u0BA4\u0BAE\u0BBF\u0BB4\u0BCD') ? 0 : 1;
-        const bIsSangeetha = b.title.includes('\u0BA4\u0BAE\u0BBF\u0BB4\u0BCD') ? 0 : 1;
-        return aIsSangeetha - bIsSangeetha;
-    });
+    const allText = [...parsedTeacher, ...parsedStudent];
+    const findArticle = (substr) => allText.find(a => (a.title || '').includes(substr));
+
+    // Pull photos from auto-converted gallery articles (docx with images only) into artItems
+    for (const a of allText) {
+        if (a.template === 'gallery' && Array.isArray(a.galleryPhotos)) {
+            for (const p of a.galleryPhotos) {
+                artItems.push({
+                    src: p.src,
+                    title: p.title || '',
+                    artist: p.artist || a.author || '',
+                    info: p.info || a.nilai || '',
+                });
+            }
+        }
+    }
+
+    const usedArt = new Set();
+    const pickArt = (artistSubstr, fullPage = false) => {
+        const idx = artItems.findIndex((a, i) => !usedArt.has(i) && (a.artist || '').includes(artistSubstr));
+        if (idx === -1) {
+            console.warn(`  [warn] Art not found: ${artistSubstr}`);
+            return null;
+        }
+        usedArt.add(idx);
+        return { ...artItems[idx], fullPage };
+    };
+
+    const ORDER = [
+        { kind: 'article', match: '\u0BA4\u0BAE\u0BBF\u0BB4\u0BCD \u0BAE\u0BCA\u0BB4\u0BBF \u0BA4\u0BCA\u0BA9\u0BCD\u0BAE\u0BC8\u0BAF\u0BC1\u0BAE\u0BCD' }, // தமிழ் மொழி தொன்மையும்
+        { kind: 'gallery', artists: ['\u0BB5\u0BBF\u0B9A\u0BBE\u0B95\u0BBE', '\u0BB5\u0BBF\u0B9A\u0BBE\u0B95\u0BBE', '\u0BB0\u0BBF\u0BA4\u0BBE\u0BA9\u0BBF\u0B95\u0BBE', '\u0BB0\u0BBF\u0BA4\u0BBE\u0BA9\u0BBF\u0B95\u0BBE'] }, // விசாகா x2 + ரிதானிகா x2
+        { kind: 'article', match: '\u0B85\u0BB1\u0BBF\u0BA4\u0BB2\u0BC7 \u0B87\u0BA9\u0BCD\u0BAA\u0BAE\u0BCD' }, // அறிதலே இன்பம்
+        { kind: 'gallery', artists: ['\u0B85\u0BB7\u0BCD\u0BAE\u0BBF\u0BA4\u0BBE', '\u0B85\u0BB7\u0BCD\u0BB5\u0BBF\u0BA9\u0BCD', '\u0B9A\u0BB7\u0BCD\u0BB5\u0BA8\u0BCD\u0BA4\u0BCD', '\u0B9A\u0BBE\u0BB0\u0BB2\u0BCD'] }, // அஷ்மிதா, அஷ்வின், சஷ்வந்த், சாரல்
+        { kind: 'article', match: '\u0B8E\u0BA9\u0BCD \u0B9A\u0BC6\u0BB2\u0BCD\u0BB2\u0BAE\u0BCD' }, // என் செல்லம்
+        { kind: 'article', match: '\u0B87\u0BB0\u0BA3\u0BCD\u0B9F\u0BBE\u0BAF\u0BBF\u0BB0\u0BAE\u0BCD' }, // இரண்டாயிரம்
+        { kind: 'gallery', artists: ['\u0B9A\u0BB9\u0BBE\u0BA9\u0BBE', '\u0BAE\u0BBF\u0BA4\u0BCD\u0BB0\u0BBE', '\u0BAE\u0B95\u0BBF\u0BB4\u0BCD', '\u0BAE\u0BC1\u0B95\u0BBF\u0BB4\u0BCD'] }, // சஹானா, மித்ரா, மகிழ், முகிழ்
+        { kind: 'article', match: '\u0B9A\u0BC6\u0BAF\u0BB1\u0BCD\u0B95\u0BC8 \u0BA8\u0BC1\u0BA3\u0BCD\u0BA3\u0BB1\u0BBF\u0BB5\u0BC1' }, // செயற்கை நுண்ணறிவு
+        { kind: 'gallery', artists: ['\u0BA8\u0BB2\u0BCD\u0BB2\u0BBF\u0BA9\u0BBE', '\u0BAE\u0BBE\u0BA9\u0BB8\u0BCD\u0BB5\u0BBF\u0BA9\u0BBF', '\u0BA8\u0BBF\u0BA4\u0BCD\u0BA4\u0BBF\u0BB2\u0BA9\u0BCD', '\u0BB2\u0BBF\u0BAF\u0BBE'] }, // நல்லினா, மானஸ்வினி, நித்திலன், லியா
+        { kind: 'article', match: '\u0B8E\u0BA9\u0BA4\u0BC1 \u0BA4\u0BAE\u0BBF\u0BB4\u0BCD\u0BAA\u0BCD \u0BAA\u0BB3\u0BCD\u0BB3\u0BBF' }, // எனது தமிழ்ப் பள்ளி
+        { kind: 'gallery', artists: ['\u0BB5\u0BB0\u0BCD\u0BA3\u0BBE', '\u0BB0\u0BBF\u0B9A\u0BCD\u0B9A\u0BBE', '\u0BAF\u0BBE\u0BB4\u0BBF\u0BA9\u0BBF'] }, // வர்ணா, ரிச்சா, யாழினி (3 images)
+        { kind: 'article', match: '\u0B8E\u0BB2\u0BBF \u0BA4\u0BBF\u0BB0\u0BC1\u0B9F\u0BC1\u0BAE\u0BBE' }, // எலி திருடுமா
+        { kind: 'gallery', artists: ['\u0B85\u0BB5\u0BA8\u0BCD\u0BA4\u0BBF\u0B95\u0BBE', '\u0BB9\u0BB0\u0BCD\u0BB7\u0BB5\u0BB0\u0BCD\u0BA4\u0BA9\u0BCD', '\u0BB7\u0BCD\u0BB0\u0BBF\u0BAF\u0BBE', '\u0BB5\u0BBE\u0B9A\u0BB5\u0BCD'] }, // அவந்திகா, ஹர்ஷவர்தன், ஷ்ரியா, வாசவ்
+        { kind: 'article', match: '\u0B85\u0BA9\u0BCD\u0BA9\u0BC8 \u0BAE\u0B9F\u0BBF' }, // அன்னை மடி (poem)
+        { kind: 'comic' },
+        { kind: 'riddle-answers' },
+    ];
 
     const articles = [];
-
-    // 1. First teacher article
-    if (parsedTeacher.length > 0) {
-        articles.push(parsedTeacher[0]);
-        console.log(`  ${articles.length}. [article] ${parsedTeacher[0].title}`);
+    for (const item of ORDER) {
+        if (item.kind === 'article') {
+            const a = findArticle(item.match);
+            if (a) {
+                articles.push(a);
+                console.log(`  ${articles.length}. [${a.template}] ${a.title}`);
+            } else {
+                console.warn(`  [warn] Article not found: ${item.match}`);
+            }
+        } else if (item.kind === 'gallery') {
+            const items = item.artists.map(s => pickArt(s, item.fullPage)).filter(Boolean);
+            if (items.length > 0) {
+                articles.push(makeGallerySection(items, `gallery-${articles.length}-${Date.now()}`));
+                console.log(`  ${articles.length}. [gallery${item.fullPage ? ' full-page' : ''}] ${items.map(i => i.artist).join(', ')}`);
+            }
+        } else if (item.kind === 'comic' && comicArticle) {
+            articles.push(comicArticle);
+            console.log(`  ${articles.length}. [comic] Comic Story`);
+        } else if (item.kind === 'riddle-answers' && riddlesAnswersArticle) {
+            articles.push(riddlesAnswersArticle);
+            console.log(`  ${articles.length}. [answers] Riddle Answers`);
+        }
     }
 
-    // 2. All remaining text content — interleaved with art and riddle cards
-    const remainingText = [...parsedTeacher.slice(1), ...parsedStudent];
+    // Distribute riddle cards across eligible prose articles (skip opener, poetry, gallery, comic, answers)
+    const eligible = [];
+    for (let i = 0; i < articles.length; i++) {
+        const a = articles[i];
+        const t = a.template || '';
+        if (i === 0) continue;
+        if (t === 'gallery' || t === 'poetry') continue;
+        if (a === comicArticle || a === riddlesAnswersArticle) continue;
+        eligible.push(i);
+    }
 
-    const fullPageArt = artItems.filter(a => a.fullPage);
-    const regularArt = artItems.filter(a => !a.fullPage);
-
-    let regIdx = 0;
-
-    // Spread riddle cards evenly across only text-template articles.
-    const textIndices = remainingText
-        .map((a, i) => (a.template === 'gallery' ? -1 : i))
-        .filter(i => i >= 0);
-    const riddleHostIdx = new Set();
-    if (riddleCards.length > 0 && textIndices.length > 0) {
-        const numCards = Math.min(riddleCards.length, textIndices.length);
+    if (riddleCards.length > 0 && eligible.length > 0) {
+        const numCards = Math.min(riddleCards.length, eligible.length);
+        const slotsToUse = new Set();
         for (let k = 0; k < numCards; k++) {
-            const slot = Math.floor((k + 0.5) * textIndices.length / numCards);
-            riddleHostIdx.add(textIndices[slot]);
+            const slot = Math.floor((k + 0.5) * eligible.length / numCards);
+            slotsToUse.add(eligible[slot]);
+        }
+        let cardIdx = 0;
+        for (const articleIdx of [...slotsToUse].sort((a, b) => a - b)) {
+            if (cardIdx >= riddleCards.length) break;
+            articles[articleIdx]._riddleCard = buildRiddleCardHtml(riddleCards[cardIdx++]);
+            console.log(`  + riddle card #${cardIdx} -> section ${articleIdx + 1} (${articles[articleIdx].title})`);
         }
     }
 
-    let hostCount = 0;
-    for (let i = 0; i < remainingText.length; i++) {
-        // Inject a riddle card mid-article (random paragraph) if this article is a host
-        if (riddleHostIdx.has(i) && hostCount < riddleCards.length) {
-            const card = riddleCards[hostCount++];
-            remainingText[i]._riddleCard = buildRiddleCardHtml(card);
-        }
-
-        // Add text article
-        articles.push(remainingText[i]);
-        console.log(`  ${articles.length}. [${remainingText[i].template}] ${remainingText[i].title}${remainingText[i]._riddleCard ? ' + riddle card' : ''}`);
-
-        // After each text article, insert 2-3 regular art pieces
-        const artCount = (i % 2 === 0) ? 2 : 3;
-        const batch = regularArt.slice(regIdx, regIdx + artCount);
-        if (batch.length > 0) {
-            regIdx += batch.length;
-            articles.push(makeGallerySection(batch, `art-spread-${i}-${Date.now()}`));
-            console.log(`  ${articles.length}. [gallery] ${batch.length} artworks`);
-        }
-    }
-    // Track index of next remaining card
-    let riddleIdx = hostCount;
-
-    // Any remaining riddle cards — attach to remaining content
-    while (riddleIdx < riddleCards.length) {
-        const card = riddleCards[riddleIdx++];
-        // Create a mini section just for the riddle card
-        articles.push({
-            id: `riddle-snippet-${riddleIdx}`,
-            title: '', subtitle: '', author: '', authorDisplay: '', category: '',
-            bodyHtml: buildRiddleCardHtml(card),
-            pullQuotes: [], subheadings: [], images: [],
-            wordCount: 10, template: 'feature-opening', sourceFile: '',
-            parseMessages: [], imageCount: 0,
-            authorPhoto: '', heroImage: '', heroCaption: '', galleryPhotos: [],
-            _isRiddleOnly: true,
-        });
-        console.log(`  ${articles.length}. [riddle card] #${riddleIdx}`);
-    }
-
-    // Full-page art
-    for (const fp of fullPageArt) {
-        articles.push(makeGallerySection([fp], `art-full-${Date.now()}`));
-        console.log(`  ${articles.length}. [full-page] ${fp.artist}`);
-    }
-
-    // Remaining regular art
-    if (regIdx < regularArt.length) {
-        const remaining = regularArt.slice(regIdx);
-        articles.push(makeGallerySection(remaining, `art-remaining-${Date.now()}`));
-        console.log(`  ${articles.length}. [gallery] ${remaining.length} remaining artworks`);
-    }
-
-    // Comic story near the end
-    if (comicArticle) {
-        articles.push(comicArticle);
-        console.log(`  ${articles.length}. [comic] Comic Story`);
-    }
-
-    // Riddle answers -- very last before back cover
-    if (riddlesAnswersArticle) {
-        articles.push(riddlesAnswersArticle);
-        console.log(`  ${articles.length}. [answers] Riddle Answers`);
+    // Warn about any unused artworks
+    const unused = artItems.filter((_, i) => !usedArt.has(i));
+    if (unused.length > 0) {
+        console.warn(`\n  [warn] ${unused.length} unused artwork(s):`);
+        unused.forEach(a => console.warn(`    - ${a.artist}`));
     }
 
     console.log(`\n== Total: ${articles.length} sections ==\n`);

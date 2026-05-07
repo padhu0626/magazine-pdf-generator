@@ -13,6 +13,7 @@ function composeIssue(issue, articles) {
     templateCssSet.add('cover');
     templateCssSet.add('back-cover');
     templateCssSet.add('gallery');
+    templateCssSet.add('credits');
 
     let allTemplateCss = '';
     for (const tmpl of templateCssSet) {
@@ -24,6 +25,7 @@ function composeIssue(issue, articles) {
 
     const magazineName = issue.magazineName || issue.title || 'Magazine';
     const coverHtml = buildCover(issue, articles, magazineName);
+    const creditsHtml = buildCredits(issue, magazineName);
     const articlesHtml = articles.map((a, idx) => buildArticleSection(a, idx, issue, magazineName, idx === articles.length - 1)).join('\n');
     const backCoverHtml = buildBackCover(issue, magazineName);
 
@@ -40,10 +42,38 @@ ${allTemplateCss}
 </head>
 <body>
 ${coverHtml}
+${creditsHtml}
 ${articlesHtml}
 ${backCoverHtml}
 </body>
 </html>`;
+}
+
+function buildCredits(issue, magazineName) {
+    const board = (issue.boardMembers && issue.boardMembers.length)
+        ? issue.boardMembers
+        : ['கணேஷ்'];
+    const editor = issue.editor || 'பத்மநாபன் பொன்னையா ராஜு';
+    const boardHtml = board.map(m => `<div class="credit-name">${escapeHtml(m)}</div>`).join('');
+    return `
+<article class="credits-page">
+    <div class="credits-frame">
+        <div class="credits-masthead">${escapeHtml(magazineName)}</div>
+        <div class="credits-issue">${escapeHtml(issue.date || '')}</div>
+        <div class="credits-rule"></div>
+        <h2 class="credits-heading">ஆசிரியர் குழு</h2>
+        <div class="credit-block">
+            <div class="credit-role">ஆசிரியர் · Editor</div>
+            <div class="credit-name">${escapeHtml(editor)}</div>
+        </div>
+        <div class="credit-block">
+            <div class="credit-role">குழு உறுப்பினர்கள் · Board Members</div>
+            ${boardHtml}
+        </div>
+        <div class="credits-rule"></div>
+        <div class="credits-footer">© ${new Date().getFullYear()} · ${escapeHtml(magazineName)}</div>
+    </div>
+</article>`;
 }
 
 function buildPageHeader(pageNum, magazineName, sectionLabel, authorName) {
@@ -80,10 +110,7 @@ function buildCover(issue, articles, magazineName) {
         a.title && a.template !== 'gallery' && a.id && !a.id.startsWith('riddle-answers')
     );
     const teasers = teaserArticles.slice(0, 2).map(a => {
-        // Shorten long titles with ellipsis
-        let t = a.title;
-        if (t.length > 25) t = t.substring(0, 23) + '...';
-        return `<p class="teaser">${escapeHtml(t)}</p>`;
+        return `<p class="teaser">${escapeHtml(a.title)}</p>`;
     }).join('\n');
 
     return `
@@ -182,16 +209,29 @@ function buildGalleryGrid(article) {
 function injectRiddleCardIntoBody(bodyHtml, cardHtml) {
     if (!cardHtml) return bodyHtml;
     if (!bodyHtml) return cardHtml;
-    // Find positions just after each </p>, then pick a random one in the middle 30-70%
-    const closings = [];
+
+    // Regions to leave intact: poems, pull quotes, blockquotes
+    const avoid = [];
+    const blockRe = /<div\s+class="inline-poem"[\s\S]*?<\/div>|<blockquote[\s\S]*?<\/blockquote>/gi;
+    let bm;
+    while ((bm = blockRe.exec(bodyHtml)) !== null) {
+        // Pad start with 80 chars so we don't insert immediately before the block either
+        avoid.push([Math.max(0, bm.index - 80), bm.index + bm[0].length]);
+    }
+
+    // Candidate insertion points = positions just after each </p>, excluding avoid regions
     const re = /<\/p>/gi;
+    const closings = [];
     let m;
     while ((m = re.exec(bodyHtml)) !== null) {
-        closings.push(m.index + m[0].length);
+        const pos = m.index + m[0].length;
+        if (!avoid.some(([s, e]) => pos >= s && pos <= e)) closings.push(pos);
     }
     if (closings.length < 4) return bodyHtml + cardHtml;
-    const minIdx = Math.max(1, Math.floor(closings.length * 0.3));
-    const maxIdx = Math.min(closings.length - 2, Math.floor(closings.length * 0.7));
+
+    // Bias toward middle-early (25-60%) to stay clear of any closing poem at the bottom
+    const minIdx = Math.max(1, Math.floor(closings.length * 0.25));
+    const maxIdx = Math.min(closings.length - 2, Math.floor(closings.length * 0.6));
     const range = Math.max(1, maxIdx - minIdx + 1);
     const idx = minIdx + Math.floor(Math.random() * range);
     const insertAt = closings[idx];
@@ -252,7 +292,6 @@ function buildArticleSection(article, index, issue, magazineName, isLast) {
 <article class="short-story">
     ${header}
     <header class="story-header">
-        <span class="genre-tag">சிறுகதை</span>
         <h1>${escapeHtml(article.title)}</h1>
         ${authorLabel ? `<p class="byline">${escapeHtml(authorLabel)}</p>` : ''}
     </header>
@@ -265,11 +304,15 @@ function buildArticleSection(article, index, issue, magazineName, isLast) {
 <article class="poetry-page">
     ${header}
     <header class="poetry-header">
-        <span class="genre-tag">கவிதை</span>
+        <div class="poem-flourish">❦</div>
         <h1>${escapeHtml(article.title)}</h1>
+        <div class="poem-rule"></div>
     </header>
-    <div class="poem"><div class="poem-body">${bodyHtml}</div>
-    ${authorLabel ? `<div class="poet-credit">— ${escapeHtml(authorLabel)}</div>` : ''}</div>
+    <div class="poem">
+        <div class="poem-body">${bodyHtml}</div>
+        ${authorLabel ? `<div class="poet-credit">— ${escapeHtml(authorLabel)}</div>` : ''}
+        <div class="poem-closing-flourish">❧</div>
+    </div>
     ${footer}
 </article>`;
 
@@ -305,7 +348,6 @@ function buildArticleSection(article, index, issue, magazineName, isLast) {
     ${header}
     ${buildHeroBanner(article)}
     <header class="feature-hero">
-        ${article.category ? `<span class="category-tag">${escapeHtml(article.category)}</span>` : ''}
         <hr class="accent-line">
         <h1>${escapeHtml(article.title)}</h1>
         ${article.subtitle ? `<p class="subtitle">${escapeHtml(article.subtitle)}</p>` : ''}

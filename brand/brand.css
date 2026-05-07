@@ -17,11 +17,12 @@
 }
 
 /* --- Typography --- */
-@import url('https://fonts.googleapis.com/css2?family=Catamaran:wght@400;600;700;800;900&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Catamaran:wght@400;600;700;800;900&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Arima+Madurai:wght@700;800;900&family=Tiro+Tamil&family=Inter:wght@400;500;600&display=swap');
 
 :root {
     --font-tamil-body: 'Noto Sans Tamil', 'Latha', 'Tamil MN', sans-serif;
     --font-tamil-display: 'Catamaran', 'Noto Sans Tamil', sans-serif;
+    --font-masthead: 'Arima Madurai', 'Tiro Tamil', 'Noto Sans Tamil', serif;
     --font-english: 'Inter', -apple-system, sans-serif;
     --font-ui: 'Inter', sans-serif;
 

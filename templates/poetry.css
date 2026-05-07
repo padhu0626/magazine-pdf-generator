@@ -1,21 +1,28 @@
-/* Template 8: Poetry Page */
+/* Template 8: Poetry Page — Tamil verse layout */
 .poetry-page {
     break-after: page;
 }
 
 .poetry-page .poetry-header {
     text-align: center;
-    margin-bottom: 30pt;
+    margin-bottom: 16pt;
 }
 
 .poetry-page .poetry-header .genre-tag {
     font-family: var(--font-english);
     font-size: 8pt;
     text-transform: uppercase;
-    letter-spacing: 0.25em;
+    letter-spacing: 0.3em;
     color: var(--color-gold);
-    margin-bottom: 12pt;
+    margin-bottom: 8pt;
     display: block;
+}
+
+.poetry-page .poetry-header .poem-flourish {
+    color: var(--color-gold);
+    font-size: 16pt;
+    line-height: 1;
+    margin: 4pt 0 2pt;
 }
 
 .poetry-page .poetry-header h1 {
@@ -23,44 +30,54 @@
     font-size: 26pt;
     font-weight: 800;
     color: var(--color-primary);
-    margin-bottom: 6pt;
+    margin: 4pt 0 6pt;
+    line-height: 1.15;
 }
 
-.poetry-page .poetry-header .poet-name {
-    font-family: var(--font-tamil-body);
-    font-size: 11pt;
-    color: var(--color-muted);
+.poetry-page .poetry-header .poem-rule {
+    width: 50pt;
+    height: 0.8pt;
+    background: var(--color-gold);
+    margin: 6pt auto 0;
 }
 
+/* Poem container */
 .poem {
-    max-width: 70%;
-    margin: 0 auto 30pt;
-    break-inside: avoid;
-}
-
-.poem .poem-title {
-    font-family: var(--font-tamil-display);
-    font-size: 16pt;
-    font-weight: 700;
-    color: var(--color-primary);
-    margin-bottom: 8pt;
-    text-align: center;
+    max-width: 78%;
+    margin: 0 auto 18pt;
+    break-inside: auto;
 }
 
 .poem .poem-body {
-    font-family: var(--font-tamil-body);
-    font-size: 12pt;
-    line-height: 2;
+    font-family: var(--font-tamil-display);
+    font-size: 11.5pt;
+    font-weight: 500;
+    line-height: 1.5;
     text-align: center;
     color: var(--color-body);
+    column-count: 2;
+    column-gap: 14mm;
+    column-rule: 0.4pt solid var(--color-divider);
 }
 
+/* Each line is its own <p>; tight stacking within a stanza */
 .poem .poem-body p {
-    margin-bottom: 6pt;
+    margin: 0;
+    text-indent: 0;
+    break-inside: avoid;
 }
 
-.poem .stanza-break {
-    height: 14pt;
+/* Empty paragraphs from the docx act as stanza breaks */
+.poem .poem-body p:empty,
+.poem .poem-body p:has(> br:only-child) {
+    height: 10pt;
+    margin: 0;
+}
+
+/* Single-column override available via class hook if needed */
+.poem.single-col .poem-body {
+    column-count: 1;
+    column-rule: none;
 }
 
 .poem .poet-credit {
@@ -68,8 +85,18 @@
     font-family: var(--font-tamil-body);
     font-size: 10pt;
     color: var(--color-muted);
-    margin-top: 10pt;
+    margin-top: 14pt;
     font-style: italic;
+    letter-spacing: 0.04em;
+}
+
+/* Closing flourish under the poem */
+.poem-closing-flourish {
+    text-align: center;
+    color: var(--color-gold);
+    font-size: 14pt;
+    line-height: 1;
+    margin-top: 12pt;
 }
 
 .poem-divider {

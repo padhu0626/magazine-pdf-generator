@@ -45,18 +45,29 @@
 .cover-masthead {
     text-align: center;
     padding-top: 2mm;
+    position: relative;
+}
+
+.cover-masthead::before {
+    content: "";
+    display: block;
+    width: 90pt;
+    height: 1pt;
+    background: var(--color-gold);
+    margin: 0 auto 8pt;
+    opacity: 0.85;
 }
 
 .cover-masthead .magazine-name {
-    font-family: var(--font-tamil-display);
-    font-size: 44pt;
+    font-family: var(--font-masthead);
+    font-size: 50pt;
     font-weight: 900;
-    letter-spacing: 0.01em;
-    text-shadow: 0 2px 12px rgba(0,0,0,0.6), 0 0 1pt rgba(0,0,0,0.4);
+    letter-spacing: 0;
+    text-shadow: 0 2px 14px rgba(0,0,0,0.55), 0 0 1pt rgba(0,0,0,0.4);
     margin-bottom: 4pt;
-    line-height: 1.08;
+    line-height: 1.0;
     color: #fff;
-    word-spacing: 0.05em;
+    word-spacing: 0;
 }
 
 .cover-masthead .magazine-subtitle {
