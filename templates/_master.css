@@ -491,15 +491,22 @@ figcaption {
     font-weight: 700;
     color: var(--color-accent);
     font-style: italic;
-    padding: 8pt 16pt;
+    padding: 6pt 14pt;
     margin: 8pt 0;
     border-left: 3pt solid var(--color-gold);
     background: var(--color-cream);
-    line-height: 1.6;
+    line-height: 1.5;
     break-inside: avoid;
     column-span: all;
     text-align: center;
     word-spacing: normal;
+}
+
+/* When the inline-poem is the LAST element of the article body, allow it to
+   break across columns/pages so it doesn't get pushed to a near-empty new page. */
+.article-body > .inline-poem:last-child {
+    break-inside: auto;
+    column-span: none;
 }
 
 .inline-poem p {

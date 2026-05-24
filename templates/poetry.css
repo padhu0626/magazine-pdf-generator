@@ -74,6 +74,17 @@
     margin: 0;
 }
 
+/* When stanzas are explicitly grouped (build-magazine.js wraps them in .stanza),
+   keep stanza together and add visible breathing room between stanzas. */
+.poem .poem-body .stanza {
+    break-inside: avoid;
+    margin-bottom: 12pt;
+}
+
+.poem .poem-body .stanza:last-child {
+    margin-bottom: 0;
+}
+
 /* Single-column override available via class hook if needed */
 .poem.single-col .poem-body {
     column-count: 1;

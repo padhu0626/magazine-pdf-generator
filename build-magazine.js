@@ -162,7 +162,7 @@ function collectFiles() {
             const info = parseFilename(f);
             info.path = fullPath;
             info.isTeacher = isTeacher;
-            const key = `${info.type}|${info.name}|${info.number}`;
+            const key = `${info.type}|${info.name}|${info.title}|${info.number}`;
             if (seenFiles.has(key)) continue;
             seenFiles.add(key);
             const typeLower = info.type.toLowerCase();
@@ -248,12 +248,18 @@ async function buildArticle(fileInfo, index) {
         article.authorDisplay = fileInfo.name || article.author;
     }
 
+    // Convert <br><br> sequences (Word's blank-line-within-paragraph) into proper paragraph breaks
+    if (article.bodyHtml) {
+        article.bodyHtml = article.bodyHtml.replace(/(\s*<br\s*\/?>\s*){2,}/gi, '</p><p>');
+    }
+
     // Strip duplicate title (and any author byline that follows) from the start of the body —
     // most .docx files repeat the title/author at the top, which gets rendered twice otherwise.
     if (article.bodyHtml) {
         const stripTags = (html) => html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
         const titleText = stripTags(article.title || '');
         const authorText = stripTags(article.authorDisplay || article.author || '');
+        const authorFirstName = (fileInfo.name || '').split(/\s+/)[0] || '';
 
         for (let pass = 0; pass < 3; pass++) {
             const m = article.bodyHtml.match(/^\s*<(p|h[1-6])[^>]*>([\s\S]*?)<\/\1>/i);
@@ -261,7 +267,6 @@ async function buildArticle(fileInfo, index) {
             const firstHtml = m[2];
             const firstText = stripTags(firstHtml);
             const isShort = firstText.length > 0 && firstText.length < 120;
-            // Heuristic: first short paragraph wrapped entirely in <strong> reads as a heading
             const allBold = /^\s*<strong[^>]*>[\s\S]*<\/strong>\s*$/i.test(firstHtml.trim());
             const matchesTitle = titleText && firstText === titleText;
             const matchesAuthor = authorText && isShort &&
@@ -273,6 +278,24 @@ async function buildArticle(fileInfo, index) {
                 break;
             }
         }
+
+        // Strip trailing author byline (e.g., "-Name", "எழுத்தாளர்: Name", "Name, நிலை X")
+        for (let pass = 0; pass < 2; pass++) {
+            const re = /<(p|h[1-6])[^>]*>([\s\S]*?)<\/\1>\s*$/i;
+            const m = re.exec(article.bodyHtml);
+            if (!m) break;
+            const lastText = stripTags(m[2]);
+            if (!lastText || lastText.length > 120) break;
+            const startsWithDash = /^[-–—]/.test(lastText);
+            const hasBylineKeyword = /எழுத்தாளர்|ஆசிரியர்|புனைவர்|by\s|—\s/i.test(lastText);
+            const matchesAuthor = authorText && (lastText === authorText || lastText.includes(authorText));
+            const matchesFirstName = authorFirstName && lastText.includes(authorFirstName) && lastText.length < 80;
+            if (startsWithDash || hasBylineKeyword || matchesAuthor || matchesFirstName) {
+                article.bodyHtml = article.bodyHtml.slice(0, m.index).replace(/\s+$/, '');
+            } else {
+                break;
+            }
+        }
     }
 
     const typeLower = (fileInfo.type || '').toLowerCase();
@@ -280,6 +303,32 @@ async function buildArticle(fileInfo, index) {
     else if (typeLower === 'story') article.template = 'short-story';
     else if (typeLower === 'essay' || typeLower === 'article') article.template = 'feature-opening';
     else article.template = article.suggestedTemplate || 'feature-opening';
+
+    // For poems: group consecutive lines into stanzas. Stanza ends at:
+    //  (a) an empty paragraph (existing convention from Annai Madi), or
+    //  (b) a line ending with '!' (common Tamil verse stanza marker).
+    if (article.template === 'poetry' && article.bodyHtml) {
+        const parts = article.bodyHtml.split(/(<p[^>]*>[\s\S]*?<\/p>)/g);
+        const stanzas = [];
+        let current = [];
+        for (const part of parts) {
+            if (!/<p/i.test(part)) continue;
+            const text = part.replace(/<[^>]+>/g, '').replace(/&[a-z]+;/gi, ' ').trim();
+            if (!text) {
+                if (current.length) { stanzas.push(current); current = []; }
+                continue;
+            }
+            current.push(part);
+            if (/!\s*$/.test(text)) {
+                stanzas.push(current);
+                current = [];
+            }
+        }
+        if (current.length) stanzas.push(current);
+        if (stanzas.length > 1) {
+            article.bodyHtml = stanzas.map(s => `<div class="stanza">${s.join('')}</div>`).join('\n');
+        }
+    }
 
     article.authorPhoto = '';
     article.heroImage = '';
@@ -576,7 +625,7 @@ async function main() {
         { kind: 'article', match: '\u0B85\u0BB1\u0BBF\u0BA4\u0BB2\u0BC7 \u0B87\u0BA9\u0BCD\u0BAA\u0BAE\u0BCD' }, // அறிதலே இன்பம்
         { kind: 'gallery', artists: ['\u0B85\u0BB7\u0BCD\u0BAE\u0BBF\u0BA4\u0BBE', '\u0B85\u0BB7\u0BCD\u0BB5\u0BBF\u0BA9\u0BCD', '\u0B9A\u0BB7\u0BCD\u0BB5\u0BA8\u0BCD\u0BA4\u0BCD', '\u0B9A\u0BBE\u0BB0\u0BB2\u0BCD'] }, // அஷ்மிதா, அஷ்வின், சஷ்வந்த், சாரல்
         { kind: 'article', match: '\u0B8E\u0BA9\u0BCD \u0B9A\u0BC6\u0BB2\u0BCD\u0BB2\u0BAE\u0BCD' }, // என் செல்லம்
-        { kind: 'article', match: '\u0B87\u0BB0\u0BA3\u0BCD\u0B9F\u0BBE\u0BAF\u0BBF\u0BB0\u0BAE\u0BCD' }, // இரண்டாயிரம்
+        { kind: 'article', match: '\u0B8E\u0BAE\u0BCD\u0BAE\u0BCA\u0BB4\u0BBF' }, // எம்மொழி
         { kind: 'gallery', artists: ['\u0B9A\u0BB9\u0BBE\u0BA9\u0BBE', '\u0BAE\u0BBF\u0BA4\u0BCD\u0BB0\u0BBE', '\u0BAE\u0B95\u0BBF\u0BB4\u0BCD', '\u0BAE\u0BC1\u0B95\u0BBF\u0BB4\u0BCD'] }, // சஹானா, மித்ரா, மகிழ், முகிழ்
         { kind: 'article', match: '\u0B9A\u0BC6\u0BAF\u0BB1\u0BCD\u0B95\u0BC8 \u0BA8\u0BC1\u0BA3\u0BCD\u0BA3\u0BB1\u0BBF\u0BB5\u0BC1' }, // செயற்கை நுண்ணறிவு
         { kind: 'gallery', artists: ['\u0BA8\u0BB2\u0BCD\u0BB2\u0BBF\u0BA9\u0BBE', '\u0BAE\u0BBE\u0BA9\u0BB8\u0BCD\u0BB5\u0BBF\u0BA9\u0BBF', '\u0BA8\u0BBF\u0BA4\u0BCD\u0BA4\u0BBF\u0BB2\u0BA9\u0BCD', '\u0BB2\u0BBF\u0BAF\u0BBE'] }, // நல்லினா, மானஸ்வினி, நித்திலன், லியா
@@ -586,6 +635,8 @@ async function main() {
         { kind: 'gallery', artists: ['\u0B85\u0BB5\u0BA8\u0BCD\u0BA4\u0BBF\u0B95\u0BBE', '\u0BB9\u0BB0\u0BCD\u0BB7\u0BB5\u0BB0\u0BCD\u0BA4\u0BA9\u0BCD', '\u0BB7\u0BCD\u0BB0\u0BBF\u0BAF\u0BBE', '\u0BB5\u0BBE\u0B9A\u0BB5\u0BCD'] }, // அவந்திகா, ஹர்ஷவர்தன், ஷ்ரியா, வாசவ்
         { kind: 'article', match: '\u0B85\u0BA9\u0BCD\u0BA9\u0BC8 \u0BAE\u0B9F\u0BBF' }, // அன்னை மடி (poem)
         { kind: 'comic' },
+        { kind: 'article', match: 'பி(இ)றவாக்' }, // பி(இ)றவாக் கவிதை (Padhu's poem)
+        { kind: 'article', match: 'கனவுப்' }, // கனவுப் பூச்சி (மீமெய்மைக் கவிதை) — Padhu's surrealism poem
         { kind: 'riddle-answers' },
     ];
 
@@ -657,6 +708,17 @@ async function main() {
         coverImage: '',
         date: 'ஏப்ரல் 2026',
         tagline: '',
+        editor: 'பத்மநாபன் பொன்னையா ராஜு',
+        proofReader: 'சத்யா சந்திரவடிவேல்',
+        boardMembers: [
+            { name: 'ஜெயகுரு சீதாராமன்', role: 'President · தலைவர்' },
+            { name: 'சங்கர் ராமலிங்கம்', role: 'Vice President · துணைத் தலைவர்' },
+            { name: 'கணேஷ் மணிவண்ணன்', role: 'IT Director · தகவல் தொழில்நுட்பம்' },
+            { name: 'ரம்யா பாரதி', role: 'Event Director · நிகழ்வுகள்' },
+            { name: 'பழனியப்பன் சங்கரகுமார்', role: 'Finance Director · பொருளாளர்' },
+            { name: 'சதீஷ் சிவகுழந்தை', role: 'Facilities Director · வசதிகள்' },
+            { name: 'செல்வகுமார் முத்துசாமி', role: 'Curriculum Director · பாடத்திட்டம்' },
+        ],
         articles,
         createdAt: new Date().toISOString(),
     };
@@ -695,6 +757,45 @@ async function main() {
             console.log(`Back cover image: ${c}`);
             break;
         }
+    }
+
+    // --- Photo Sections (event photos, class photos, etc.) ---
+    issue.photoSections = [];
+
+    const photoFolders = [
+        { dir: 'Pongal-2026', title: 'பொங்கல் விழா 2026', subtitle: 'Pongal Celebration' },
+        { dir: 'Class-Pics-2025-2026', title: 'வகுப்பு நினைவுகள்', subtitle: 'Class Memories 2025–2026' },
+    ];
+
+    for (const folder of photoFolders) {
+        const folderPath = path.join(PROJECT_ROOT, folder.dir);
+        if (!fs.existsSync(folderPath)) continue;
+
+        const files = fs.readdirSync(folderPath)
+            .filter(f => /\.(jpe?g|png)$/i.test(f))
+            .sort();
+
+        if (!files.length) continue;
+
+        console.log(`Photo section: ${folder.title} (${files.length} photos)`);
+
+        const photos = [];
+        let landscapeCount = 0;
+        for (const f of files) {
+            const filePath = path.join(folderPath, f);
+            const meta = await sharp(filePath).metadata();
+            const isLandscape = meta.width > meta.height;
+            if (isLandscape) landscapeCount++;
+            const src = await optimizeImage(filePath, `photo-${folder.dir}-${photos.length}`);
+            photos.push({ src, caption: '' });
+        }
+
+        issue.photoSections.push({
+            title: folder.title,
+            subtitle: folder.subtitle,
+            photos,
+            orientation: landscapeCount > photos.length / 2 ? 'landscape' : 'portrait',
+        });
     }
 
     const issueJsonPath = path.join(PROJECT_ROOT, 'issues', 'current-issue.json');

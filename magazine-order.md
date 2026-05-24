@@ -47,7 +47,7 @@ When done, save and tell me — I'll read this file and rebuild the magazine.
 **Riddle card injected mid-article**
 
 ### 6. Article — `feature-opening`
-**Title:** இரண்டாயிரம் ஆண்டுகள் இளமை
+**Title:** எம்மொழி! செம்மொழி!
 **Author:** பத்மநாபன் பொன்னையா ராஜு, நிலை 6B ஆசிரியர்
 
 ### 7. Gallery (4 images — 2×2)
@@ -96,7 +96,15 @@ When done, save and tell me — I'll read this file and rebuild the magazine.
 - செழியன் சரவணன், நிலை 1 — பக்கம் 1 *(top)*
 - செழியன் சரவணன், நிலை 1 — பக்கம் 2 *(bottom)*
 
-### 16. Riddle Answers — `feature-opening` (auto-generated)
+### 16. Poem — `poetry`
+**Title:** பி(இ)றவாக் கவிதை
+**Author:** பத்மநாபன் பொன்னையா ராஜு, நிலை 6B ஆசிரியர்
+
+### 17. Poem — `poetry`
+**Title:** கனவுப் பூச்சி (மீமெய்மைக் கவிதை)
+**Author:** பத்மநாபன் பொன்னையா ராஜு, நிலை 6B ஆசிரியர்
+
+### 18. Riddle Answers — `feature-opening` (auto-generated)
 **Title:** விடுகதை விடைகள்
 
 ---

@@ -14,6 +14,7 @@ function composeIssue(issue, articles) {
     templateCssSet.add('back-cover');
     templateCssSet.add('gallery');
     templateCssSet.add('credits');
+    templateCssSet.add('photo-spread');
 
     let allTemplateCss = '';
     for (const tmpl of templateCssSet) {
@@ -27,6 +28,7 @@ function composeIssue(issue, articles) {
     const coverHtml = buildCover(issue, articles, magazineName);
     const creditsHtml = buildCredits(issue, magazineName);
     const articlesHtml = articles.map((a, idx) => buildArticleSection(a, idx, issue, magazineName, idx === articles.length - 1)).join('\n');
+    const photoSpreadsHtml = buildPhotoSpreads(issue, magazineName);
     const backCoverHtml = buildBackCover(issue, magazineName);
 
     return `<!DOCTYPE html>
@@ -44,6 +46,7 @@ ${allTemplateCss}
 ${coverHtml}
 ${creditsHtml}
 ${articlesHtml}
+${photoSpreadsHtml}
 ${backCoverHtml}
 </body>
 </html>`;
@@ -52,23 +55,34 @@ ${backCoverHtml}
 function buildCredits(issue, magazineName) {
     const board = (issue.boardMembers && issue.boardMembers.length)
         ? issue.boardMembers
-        : ['கணேஷ்'];
+        : [{ name: 'கணேஷ்', role: '' }];
     const editor = issue.editor || 'பத்மநாபன் பொன்னையா ராஜு';
-    const boardHtml = board.map(m => `<div class="credit-name">${escapeHtml(m)}</div>`).join('');
+    const proofReader = issue.proofReader || '';
+    const boardHtml = board.map(m => {
+        const name = typeof m === 'string' ? m : (m.name || '');
+        const role = typeof m === 'string' ? '' : (m.role || '');
+        return `<div class="credit-board-item">
+            <div class="credit-name">${escapeHtml(name)}</div>
+            ${role ? `<div class="credit-board-role">${escapeHtml(role)}</div>` : ''}
+        </div>`;
+    }).join('');
     return `
 <article class="credits-page">
     <div class="credits-frame">
         <div class="credits-masthead">${escapeHtml(magazineName)}</div>
         <div class="credits-issue">${escapeHtml(issue.date || '')}</div>
         <div class="credits-rule"></div>
-        <h2 class="credits-heading">ஆசிரியர் குழு</h2>
         <div class="credit-block">
             <div class="credit-role">ஆசிரியர் · Editor</div>
             <div class="credit-name">${escapeHtml(editor)}</div>
         </div>
+        ${proofReader ? `<div class="credit-block">
+            <div class="credit-role">மெய்ப்பு திருத்துநர் · Proof Read Volunteer</div>
+            <div class="credit-name">${escapeHtml(proofReader)}</div>
+        </div>` : ''}
         <div class="credit-block">
-            <div class="credit-role">குழு உறுப்பினர்கள் · Board Members</div>
-            ${boardHtml}
+            <div class="credit-role">ஆலோசனைக் குழு · Review Committee & Board</div>
+            <div class="credit-board-grid">${boardHtml}</div>
         </div>
         <div class="credits-rule"></div>
         <div class="credits-footer">© ${new Date().getFullYear()} · ${escapeHtml(magazineName)}</div>
@@ -358,6 +372,67 @@ function buildArticleSection(article, index, issue, magazineName, isLast) {
     ${footer}
 </article>`;
     }
+}
+
+// --- Photo Spread Builder ---
+// Packs 6 photos per page (3x2 grid) for a compact magazine look.
+// Uses dark background with object-fit:contain so full photos are visible.
+
+function buildPhotoSpreads(issue, magazineName) {
+    const photoSections = issue.photoSections || [];
+    if (!photoSections.length) return '';
+
+    let html = '';
+
+    for (const section of photoSections) {
+        const photos = section.photos || [];
+        if (!photos.length) continue;
+
+        // Section divider page with hero image (use first photo)
+        const heroPhoto = photos[0];
+        html += `
+<div class="photo-section-divider">
+    <img class="cover-bg" src="${escapeHtml(heroPhoto.src)}" alt="">
+    <div class="divider-overlay"></div>
+    <div class="divider-content">
+        <div class="divider-rule"></div>
+        <div class="divider-title">${escapeHtml(section.title)}</div>
+        ${section.subtitle ? `<div class="divider-subtitle">${escapeHtml(section.subtitle)}</div>` : ''}
+    </div>
+</div>`;
+
+        // Remaining photos go into grid pages — 6 per page
+        const remaining = photos.slice(1);
+        if (!remaining.length) continue;
+
+        // Landscape photos: 2 cols x 4 rows = 8/page. Portrait: 3 cols x 3 rows = 9/page.
+        const isLandscape = section.orientation === 'landscape';
+        const PHOTOS_PER_PAGE = isLandscape ? 8 : 9;
+        const gridClass = isLandscape ? 'landscape' : 'portrait';
+
+        for (let i = 0; i < remaining.length; i += PHOTOS_PER_PAGE) {
+            const pagePhotos = remaining.slice(i, i + PHOTOS_PER_PAGE);
+            const layoutClass = `grid-${gridClass}`;
+
+            html += `
+<article class="photo-spread-page">
+    ${buildPageHeader('', magazineName, section.title, '')}
+    <div class="section-strip">
+        <span class="section-name">${escapeHtml(section.title)}</span>
+    </div>
+    <div class="photo-grid ${layoutClass}">
+        ${pagePhotos.map((p) => `
+        <div class="photo-cell">
+            <img src="${escapeHtml(p.src)}" alt="${escapeHtml(p.caption || '')}">
+            ${p.caption ? `<div class="photo-caption">${escapeHtml(p.caption)}</div>` : ''}
+        </div>`).join('')}
+    </div>
+    ${buildPageFooter(magazineName, issue.date || '', issue.website || '')}
+</article>`;
+        }
+    }
+
+    return html;
 }
 
 function buildBackCover(issue, magazineName) {

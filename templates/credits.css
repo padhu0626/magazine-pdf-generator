@@ -96,6 +96,35 @@
     margin-bottom: 2pt;
 }
 
+.credits-page .credit-board-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 16pt;
+    row-gap: 8pt;
+    margin-top: 4pt;
+}
+
+.credits-page .credit-board-item {
+    text-align: center;
+}
+
+/* Center the last item if it's alone in its row (odd total count) */
+.credits-page .credit-board-grid .credit-board-item:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+}
+
+.credits-page .credit-board-grid .credit-name {
+    font-size: 11pt;
+    margin-bottom: 1pt;
+}
+
+.credits-page .credit-board-role {
+    font-family: var(--font-english);
+    font-size: 7.5pt;
+    color: var(--color-muted);
+    letter-spacing: 0.06em;
+}
+
 .credits-page .credits-footer {
     font-family: var(--font-english);
     font-size: 7.5pt;
